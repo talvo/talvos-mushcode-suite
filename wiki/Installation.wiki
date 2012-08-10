@@ -10,9 +10,70 @@ First, you need to make a new wizard character. This character will own everythi
     # @power `*`!CoreWiz=NO_PAY
   # Logout of God and connect to your newly-made !CoreWiz. DO NOT INSTALL THE CODE AS GOD.
     # Download the [http://talvos-mushcode-suite.googlecode.com/svn/trunk/suite-core Core] and install by copying and pasting into your MUSH. This is the code which powers the Suite. 
-    # Download and install (by copy/pasting to your MUSH) any of the [Modules] you want to use. They're all optional - you can pick the ones you want and skip the rest.
+    # Download and install (by copy/pasting to your MUSH) any of the [#Modules Modules] you want to use. They're all optional - you can pick the ones you want and skip the rest.
       * Note that some modules may tell you to run an additional command as God to complete the installation.
   # @shutdown/reboot
   # That's it - the core is now installed and should be working. Check the helpfiles for the modules you've installed to see how to customize them for your game.
 
+----
+=Modules=
+When you've installed the Core, you can download any of the modules you want, and skip the ones you don't. Modules currently available are:
+
+
+==The Core==
+The core, which runs the MUSHcode Suite. Install first.
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/suite-core Code]
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/suite-core.hlp Helpfiles]
+
+==Basic Globals==
+A set of standard softcoded global commands: customizable +who, +3who, +where, OOC speech cmd, +display (for viewing public attrs on players), +newbies and +oldbies, count (checks for mismatched brackets in code), +admins/+staff, +finger, +selfboot, +poll. 
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/basic-globals/basic-globals Code]
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/basic-globals/basic-globals.hlp Helpfiles]
+
+==Com / Chat System==
+A softcoded chat system with similar features (but a slightly different look-and-feel) to the built-in @chat system. 
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/com/com Code]
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/com/com.hlp Helpfiles]
+
+==+Inspect / Views==
+System for adding extra details onto a room or other object without cluttering the desc. Details can be hidden, for "quest" items and suchlike. 
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/inspect/inspect Code]
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/inspect/inspect.hlp Helpfiles]
+
+==LWatch==
+Lets players see when their friends connect and disconnect. 
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/lwatch/lwatch Code]
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/lwatch/lwatch.hlp Helpfiles]
+
+==Alts (Alternate Characters)==
+System for tracking and managing alternative characters (alts). 
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/alts/alts Code]
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/alts/alts.hlp Helpfiles]
+
+==Wardrobe / !DescChanger==
+_Requires MySQL_. Lets players keep several different descriptions for their characters, and switch between them easily. 
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/wardrobe/wardrobe Code]
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/wardrobe/wardrobe.hlp Helpfiles]
+
+==+Top==
+Shows player activity for the current month, and since the system was installed. 
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/top/top Code]
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/top/top.hlp Helpfiles]
+
+==Money / Resources / Economy==
+Coded Economy system which can handle multiple denominations and currencies of money, and an unlimited number of non-monetary resources. 
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/econ/econ Code]
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/econ/econ.hlp Helpfiles]
+
+==Languages==
+Players can learn multiple IC languages, speak them at different fluencies, etc. Allows for partial recognition of sentences based on speaker and listener fluency. Also allows for writing (in descs, etc) in languages.
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/language/language Code]
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/language/language.hlp Helpfiles]
+
+==+Help/News/Etc==
+A system that allows you to easily set up softcoded help commands which can be searched (for +help, +ahelp, etc). Can also be used for 'news' or 'theme' type commands.
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/help/help Code]
+  * [http://talvos-mushcode-suite.googlecode.com/svn/trunk/modules/help/help.hlp Helpfiles]
+
+----
 This code is fully supported - if you have any problems, please email me. If you find a bug, or would like to suggest a new feature, please open an Issue Ticket here on the Google Code site.
