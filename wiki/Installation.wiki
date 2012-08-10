@@ -1,3 +1,5 @@
+=Downloading/Installing Talvo's MUSHcode Suite=
+
 Installing Talvo's MUSHcode Suite is very simple.
 
 First, you need to make a new wizard character. This character will own everything in the Suite. ALWAYS use this character to make changes to the Suite. NEVER use this character for anything else.
