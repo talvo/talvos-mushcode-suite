@@ -1,0 +1,49 @@
+@@ @@@@@@@@@@
+@@ +Lwatch Code by Talvo
+@@ A part of Talvo's MUSHcode Suite from www.talvo.com
+
+@@ @@@@@@@@@@
+think ansi(h,Installing the +LWatch code...)
+
+&lwatch`cmd.lwatch-add %va=$+lwatch/add *: @nspemit/silent %#=ufun(%ve/tag,lwatch)[ufun(%vb/lwatch`fun.lwatch-add,%0)]
+
+&lwatch`fun.lwatch-add %vb=switch(0,hastype(%#,PLAYER),Only players can use this command.,t(setr(0,objid(pmatch(%0)))),No such player.,comp(%q0,%:),You can't watch yourself!,member(get(%#/lwatch),%q0),You start watching [name(%q0)].[ufun(lwatch`fun.lwatch-adjust,%:,LWATCH,%q0,union)][ufun(lwatch`fun.lwatch-adjust,%q0,LWATCH`BY,%:,union)],You're already watching [name(%q0)].)
+
+&lwatch`fun.lwatch-adjust %vb=attrib_set(%0/%1,filterbool(#lambda/num(%%0),set%3(get(%0/%1),%2)))
+
+@@ @@@@@@@@@@
+&lwatch`cmd.lwatch-remove %va=$+lwatch/remove *: @nspemit/silent %#=ufun(%ve/tag,lwatch)[ufun(%vb/lwatch`fun.lwatch-remove,%0)]
+
+&lwatch`fun.lwatch-remove %vb=switch(0,hastype(%#,PLAYER),Only players can use this command.,t(setr(0,objid(pmatch(%0)))),No such player.,member(get(%#/lwatch),%q0),You're not watching [name(%q0)] anyway!,You stop watching [name(%q0)].[ufun(lwatch`fun.lwatch-adjust,%:,LWATCH,%q0,diff)][ufun(lwatch`fun.lwatch-adjust,%q0,LWATCH`BY,%:,diff)])
+
+@@ @@@@@@@@@@
+@@ Must be on wiz object to use elock in lwatch-hilite
+&lwatch`cmd.lwatch %va=$+lwatch: @nspemit/silent %#=ufun(%ve/tag,lwatch)[ufun(%vb/lwatch`fun.lwatch)]
+
+&lwatch`fun.lwatch %vb=You [switch(squish(get(%#/LWATCH)),,aren't watching anyone,are watching [itemize(map(#lambda/name(%%0),#$,,|),|)])].%r[space(10)][switch(squish(get(%#/LWATCH`BY)),,Nobody is watching you.,You are being watched by [itemize(iter(#$,ufun(lwatch`fun.lwatch-hilite,##),,|),|)].)]
+
+&lwatch`fun.lwatch-hilite %vb=if(elock(%#/lwatch,%0),name(%0),ansi(rh,name(%0)))
+
+@@ @@@@@@@@@@
+&lwatch`aconnect %vb=nspemit(filter(#lambda/[ufun(lwatch`filter_watchers,%#)],get(%#/lwatch`by)),ufun(%ve/tag,lwatch)%n has [if(hidden(%#),HIDDEN%b)][switch(%1,1,,re)]connected.)
+
+&lwatch`filter_watchers %vb=cand\([if(hidden(%0),member\(lwho(%%0)\,%0\),1)],[if(member(llocks(%#),USER:LWATCH),elock\(%0/lwatch\,%%0\),1)]\)
+
+&lwatch`adisconnect %vb=nspemit(if(member(llocks(%#),USER:LWATCH),filter(#lambda/elock(%#/lwatch\,%%0),get(%#/lwatch`by)),get(%#/lwatch`by)),ufun(%ve/tag,lwatch)%n has [if(%1,partially%b)]disconnected.)
+
+@@ Does not work, b/c on disconnect you're gone from lwho() already. No good way to check hidden(). Feh.
+@@ &lwatch`adisconnect %vb=nspemit(filter(#lambda/[ufun(lwatch`filter_watchers,%#)],get(%#/lwatch`by)),ufun(%ve/tag,lwatch)%n has [if(hidden(%#),HIDDEN%b)][if(%1,partially%b)]disconnected.)
+
+
+@@ @@@@@@@@@@
+think ansi(h,Adding startup attributes...)
+&lwatch`attr`lwatch %vs=no_command no_inherit no_clone mortal_dark wizard
+
+
+@@ @@@@@@@@@@
+think ansi(h,Adding package to the Core...)
+
++TMCS/ADDPACKAGE lwatch=+LWatch/1.2/Player connect and disconnect tracker, akin to the MONITOR flag for mortals/\[+LWATCH\]%b
+
+think ansi(h,Installation complete.)
+

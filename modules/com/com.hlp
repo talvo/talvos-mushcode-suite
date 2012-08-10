@@ -1,0 +1,131 @@
+& TMCS COM
+& COM
+& CHAT
+
+  (Somewhat terse) Instructions for Talvo's +Com System:
+
+  For admin commands (creating and managing channels), see HELP COM ADMIN.
+  For commands to list channels, see HELP COM LISTS.
+  For joining and leaving channels, see HELP COM JOINING.
+  For how to speak on channels, see HELP COM SPEAKING.
+  For other commands, see HELP COM MISCELLANEOUS.
+
+& COM LISTS
+& +COM/ON
+& +COM/OFF
+& +COM/LIST
+& +COM/WHO
+
+  +COM/ON [<player>]
+  +COM/OFF
+  +COM/LIST [all]
+  +COM/WHO <channel>
+
+  +COM/ON lists all channels you're currently on. If a <player> is given,
+  it shows channels both you and <player> are on.
+
+  +COM/OFF lists channels which you can join but are not currently on.
+
+  +COM/LIST shows the channels you can join. +COM/LIST ALL shows all channels
+  on the game.
+
+  +COM/WHO shows the players currently on <channel>.
+
+& COM JOINING
+& +COM/JOIN
+& +COM/LEAVE
+& +COM/GAG
+& +COM/UNGAG
+& +COM/HAVEN
+
+  +COM/JOIN <channel>
+  +COM/LEAVE <channel>
+  +COM/GAG [<channel>]
+  +COM/UNGAG [<channel>]
+  +COM/HAVEN
+
+  +COM/JOIN adds you to <channel>, and +COM/LEAVE removes you from <channel>.
+
+  +COM/GAG gags <channel>, so that you will no longer hear messages on it.
+  If no <channel> is given, all channels are gagged. +COM/UNGAG does the
+  opposite. When you disconnect from the game, all channels are automatically
+  ungagged. +COM/HAVEN will gag (or ungag) all channels.
+
+& COM SPEAKING
+& =
+& ,
+& +COM/SPEAK
+& +COM/CEMIT
+& CEMIT()
+
+  +COM/SPEAK <channel>=<message>
+  ,<channel> <message>
+  =<message>
+  +COM/CEMIT <channel>=<message>
+  CEMIT(<channel>,<message>[,<header?>])
+
+  +COM/SPEAK and , can be used for speaking on a given channel.
+  The = command lets you speak on your default channel.
+
+  +COM/CEMIT is a restricted command that lets you emit messages on a
+  channel. The CEMIT() function does the same thing. If <header?> is
+  true, the channel's header is included before the message, otherwise
+  it's omitted.
+
+& COM ADMIN
+& +COM/CREATE
+& +COM/DELETE
+& +COM/DESC
+& +COM/HEADER
+& +COM/LOCK
+& +COM/MUTE
+& +COM/UNMUTE
+& +COM/CHANTITLES
+
+  +COM/CREATE <channel> - add a new channel
+  +COM/DELETE <channel> - delete a channel
+  +COM/DESC <channel>=<desc> - change the description of a channel
+  +COM/HEADER <channel>[=<header>] - set a custom header, or reset to the
+                   default header, for <channel>
+  +COM/LOCK <channel>=<fun> - lock <channel> so only players passing the
+                   ufun <fun> can join it
+  +COM/MUTE <player> - mute <player> so he can't speak on the com
+  +COM/UNMUTE <player> - unmute <player>
+  +COM/CHANTITLES <channel>=<boolean> - allow or disallow titles on
+                   the channel <channel>
+
+& COM MISCELLANEOUS
+& +COM/DEFAULT
+& +COM/INFO
+& +COM/TITLE
+& +COM/TITLES
+& +COM/TOGGLE
+& +COM/TOGGLES
+
+  +COM/DEFAULT [<channel>] - query or set your default channel. This is the
+         channel you can speak on with =<message>
+  +COM/INFO <channel> - see the header, lock, desc, etc, for a channel
+  +COM/TITLES - see all your current +com titles
+  +COM/TITLE <channel> - see your +com title on <channel>
+  +COM/TITLE <channel>=[<title>] - set or clear your title for <channel>
+  +COM/TOGGLES - list all +com toggles (options)
+  +COM/TOGGLE <option>=<boolean> - set or clear a toggle
+
+& +COM VERSION
+& +COM CHANGES
+& +COM 1.4
+& +COM 1.3
+& +COM 1.2
+
+  Version 1.4 - July 2008
+  * +com/delete only half-deleted channels. Fixed by Fraibert.
+
+  Version 1.3
+  * Converted to TMCS.
+
+  Version 1.2
+  * Initial release.
+  * Added @startup.
+
+& 78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

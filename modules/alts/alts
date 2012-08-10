@@ -1,0 +1,41 @@
+@@ @@@@@@@@@@
+@@ +Alts Code by Talvo
+@@ A part of Talvo's MUSHcode Suite from www.talvo.com
+
+@@ @@@@@@@@@@
+think ansi(h,Installing Alt commands...)
+
+&alts`cmd.alt %va=$^\+alts?(/re(?\:(?\:g(?\:i(?\:s(?\:t(?\:er?)?)?)?)?)|(?\:m(?\:o(?\:ve?)?)?)))?(?\: +(.*?)(=.*)?)?$: @nspemit/silent %#=ufun(%ve/tag,alts)[switch(%1,/reg*,ufun(%vb/alts`fun.alt-register,%:,%2,after(%3,=)),/rem*,ufun(%vb/alts`fun.alt-remove,%:,%2%3),if(strlen(%2%3),ufun(%vb/alts`fun.alt-other,%:,%2%3),ufun(%vb/alts`fun.alt-me,%:)))]
+@set %va/alts`cmd.alt=regexp
+
+&alts`fun.alt-me %vb=ufun(alts`fun.alt,%0,1)
+
+&alts`fun.alt-other %vb=switch(pmatch(%1),#-1*,No such player.,#-2,I'm not sure who you mean.,ufun(alts`fun.alt,objid(#$),switch(#$,num(%0),1,0)))
+
+&alts`fun.alt %vb=ufun(alts`fun.alt-cleanup,%0)[switch(setdiff(get(%0/alts),%0),,if(%1,You have,ufun(alts`fun.alt-online,%0) has) no registered alts,if(%1,You also play,ufun(alts`fun.alt-online,%0) also plays) [itemize(iter(#$,ufun(alts`fun.alt-online,##),,|),|)])].
+
+@@ Register an alt
+&alts`fun.alt-register %vb=ufun(alts`fun.alt-cleanup,%0)[switch(0,t(setr(0,pmatch(%1))),switch(%q0,#-1*,No such player.,#-2,I'm not sure who you mean.),comp(%q0,%#),Registering yourself?,not(member(get(%0/ALTS),setr(0,objid(%q0)))),name(%q0) is already registered as your alt.,checkpass(%q0,%2),Invalid password.,ufun(alts`fun.alt-register-sub,%0,%q0)You register [name(%q0)] as your alt.)]
+
+&alts`fun.alt-online %vb=if(member(lwhoid(%#),%0),ansi(h,name(%0)),name(%0))
+
+&alts`fun.alt-register-sub %vb=null(iter(setunion(get(%0/alts) %0,get(%1/alts) %1),attrib_set(##/alts,setunion(get(##/alts),%0 %1))))
+
+@@ Remove 'dead' players from alt list of %0.
+&alts`fun.alt-cleanup %vb=null(localize(iter(setr(0,iter(get(%0/alts),if(num(##),##))),attrib_set(##/alts,%q0))))
+
+@@ Wizard-only command, stop %0 being anyone's alt.
+&alts`fun.alt-remove %vb=switch(0,orlflags(%0,WIZARD ROYALTY),Permission denied.,t(setr(0,pmatch(%1))),No such player.,strlen(setdiff(get(%q0/alts),setr(0,objid(%q0)))),That player has no alts registered. If this is due to a bug\, and he's set as an Alt for other players\, he will have to be removed manually.,null(iter(get(%q0/alts),attrib_set(##/alts,setdiff(get(##/alts),%q0)))[attrib_set(%q0/alts,%q0)])[name(%q0)] is no longer registered as anybody's alt.)
+
+@@ @@@@@@@@@@
+think ansi(h,Setting startup attributes...)
+
+&alts`attr`alts %vs=wizard mortal_dark no_command no_inherit no_clone
+&alts`cmd`+alts %vs=/eqsplit|%va,alts`cmd.alt
+
+@@ @@@@@@@@@@
+think ansi(h,Adding package to the Core...)
+
++TMCS/ADDPACKAGE alts=+Alts/1.1b/Alternate Character tracking system/\[+ALTS\]%b
+
+think ansi(h,Installation complete.)

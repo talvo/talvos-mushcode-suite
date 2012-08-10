@@ -1,0 +1,39 @@
+@@ @@@@@@@@@@
+@@ +Inspect (Views) Code by Talvo
+@@ A part of Talvo's MUSHcode Suite from www.talvo.com
+
+@@ @@@@@@@@@@
+think ansi(h,Adding +Inspect commands...)
+
+@@ q-regs used: %q0 = bool; do the inspect?, %q1 = object inspected, %q2 = attr for detail, %q3 = o-attr for detail,
+@@   %q4 = a-attr for detail, %q5 = detail's name
+&inspect`cmd.inspect %va=$^\+inspect(/l(?\:i(?\:st?)?)?)?(?\: ((?\:([^/]+)/)?(.+)))?$: @nspemit/silent setq(0,0)%#=ufun(%ve/tag,inspect)[ufun(%ve/inspect`fun.inspect[if(strlen(%1),-list)],%2,%3,%4)] ; @assert %q0 ; @verb %q1=%#,%q2,,%q3,inspects something [if(match(%q1,%L),here,on [name(%q1)])].,%q4,%q5
+@set %va/inspect`cmd.inspect=regexp
+
+@@ %0 = whole string, %1 = before the /, %2 = after the /
+&inspect`fun.inspect-list %ve=switch(squish(%0),,setq(1,%L),setq(1,locate(%#,%0,Ncehilmnz)))[switch(%q1,#-1*,No such object.,#-2*,I'm not sure which one you mean!,switch(0,nearby(%#,%q1),You're too far away to see that.,words(ufun(inspect`fun.inspect-list-list,%q1)),There are no obvious details on [name(%q1)].,Visible details on [name(%q1)]:%r[ufun(inspect`fun.inspect-list-sub,%q1)]))]
+&inspect`fun.inspect-list-sub %ve=itemize(edit(squish(ufun(inspect`fun.inspect-list-list,%0)),%b,`,_,%b),`)
+&inspect`fun.inspect-list-list %ve=edit(setdiff(lattrp(%0/inspect`*),lattrp(%0/inspect`!*)),INSPECT`,,)
+
+&inspect`fun.inspect %ve=switch(0,t(setr(1,switch(squish(%1),,%L,locate(%#,%1,Ncehilmnz)))),switch(%q1,#-1*,No such object.,#-2*,I'm not sure which one you mean!,Unable to comply.),cor(hasattrpval(%q1,setr(2,inspect`[setr(5,edit(trimpenn(trimpenn(%2,%b),!,l),%b,_))])),hasattrpval(%q1,setr(2,inspect`!%q5))),There is no detail with that name on that object.,You inspect [name(%q1)]'s [ucstr(%q5)].[setq(3,if(hasattrpval(%q1,oinspect`%q5),oinspect`%q5,oinspect))][setq(4,if(hasattrpval(%q1,ainspect`%q5),ainspect`%q5,ainspect))][setq(0,1)])
+
+&inspect`fun.inspect-look %ve=switch(1,<[words(%c)],,not(words(ufun(inspect`fun.inspect-list-list,%L))),,nspemit(%#,ufun(%ve/tag,inspect)Type +INSPECT/LIST for a list of inspectable details.))
+
+
+@@ @@@@@@@@@@
+think ansi(h,Adding Startup attributes...)
+
+&inspect`cmd`+inspect %vs=|%va,inspect`cmd.inspect
+&inspect`attr`inspect %vs=no_command
+&inspect`attr`oinspect %vs=no_command
+&inspect`attr`ainspect %vs=no_command
+&inspect`hook`look/after %vs=%ve,inspect`fun.inspect-look
+
+@@ @@@@@@@@@@
+think ansi(h,Adding package to the Core...)
+
++TMCS/ADDPACKAGE inspect=+Inspect (Views)/1.1b/A +Inspect (Views) system for adding extra, and possibly hidden, details to rooms and other objects/\[+INSPECT\]%b
+
+@@ @@@@@@@@@@
+think ansi(h,Installation Complete.)
+

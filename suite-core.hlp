@@ -1,0 +1,86 @@
+& 78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+& TMCS
+& Talvo's MUSHcode Suite
+
+  The following commands are installed a part of the suite's Core:
+  +TMCS
+
+  For a list of packages installed with the Core, type +TMCS. For help on
+  the commands in those packages, see HELP TMCS <package>.
+
+& +TMCS
+
+  +TMCS [<package>]
+
+  With no arguments, +TMCS lists all installed packages in the Suite.
+  If a <package> is given, more information (such as the version number)
+  is given about the package. Admins will also see all the objects installed
+  as a part of the package.
+
+  For admin-only commands, see HELP +TMCS2.
+
+& +TMCS2
+
+  +TMCS/ADDPACKAGE <package>=<name>/<version>/<desc>/<tag>
+  +TMCS/REGISTER <package>=<object>
+  +TMCS/UNREGISTER <package>=<object>
+
+  The /addpackage switch adds a new package to the system, or updates an
+  existing package. <package> is the internal name of the package, and can
+  only contain letters, numbers, hyphens, underscores or periods, and should
+  be between 1 and 25 characters long. <name> is an English-readable name
+  for the package. <version> is the version number, <desc> a short description
+  of what the package does, and <tag> is a tag which precedes the output of
+  most of the commands in the package, if any.
+
+  The /register switch registers an object as belonging to the package; when
+  the package is deleted, all registered objects will be destroyed
+  automatically. The /unregister switch removes the association between the
+  package and the object, so that it will not be destroyed when the package
+  is removed. It should be used either to preserve the object, or before the
+  object is destroyed, if this is done while the package is still installed.
+  In both cases, <object> is the dbref or objid of the object to [un]register.
+
+  Continued in HELP +TMCS3.
+
+& TMCS3
+
+  +TMCS/UPDATE
+  +TMCS/DELETE <package>
+
+  With the /update switch, this command updates all the objects in the Suite
+  to tell them about newly added objects which are referenced in the V? or X?
+  attributes of the Suite. It should be used whenever such an object is added.
+
+  The /delete switch can only be used by God. It deletes all the code and
+  objects created as a part of <package>, and should be used very carefully.
+  Note that if the package has set attributes on players, or other objects
+  on the MUSH, they won't be deleted, and must be removed manually if
+  desired.
+
+  Other packages may add additional switches for the TMCS command, which will
+  be documented in the help for those packages.
+
+& TMCS CHANGES
+
+  Core 1.4 - August 2012
+  
+  * Moved to Google Code - http://code.google.com/p/talvos-mushcode-suite/
+
+  Core 1.3 - November 25th 2008
+
+  * Added functional forms of +TMCS/REGISTER and +TMCS/UNREGISTER.
+  * Fixed typo in +TMCS/UNREGISTER so it's possible to remove registered
+    objects which have already been destroyed.
+
+  Core 1.2 - July 23 2007
+
+  * Added the /addpackage, /register and /unregister switches to +TMCS.
+  * Added MISC and TRG categories to the startup object
+  * Fixed a minor bug in +tmcs/delete
+  * /addpackage was misused in the Core installation. Fixed by MuppetFoo.
+
+& 78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

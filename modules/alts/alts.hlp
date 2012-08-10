@@ -1,0 +1,24 @@
+& 78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+& TMCS ALTS
+& ALTS
+& ALTS 1.0
+& ALTERNATE CHARACTERS
+& +ALTS
+
+  +ALTS [<player>]
+  +ALTS/REGISTER <player>=<password>
+  +ALTS/REMOVE <player>
+
+  The first command lists all the characters played by <player>, or all your
+  characters if no <player> is given.
+
+  The second command registers <player>, whose password is <password>, as
+  one of your characters. You must enter his password correctly.
+
+  The third command unregisters <player>, so he is not shown as being an alt
+  of any character. This command can only be used by wizards, and should be
+  used before a player is purged.
+
+  For the MUSH's Alt policy, please see NEWS ALTS.

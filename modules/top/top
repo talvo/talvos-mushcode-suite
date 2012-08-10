@@ -1,0 +1,42 @@
+@@ @@@@@@@@@@
+@@ +Top Code by Talvo
+@@ A part of Talvo's MUSHcode Suite from www.talvo.com
+
+@@ @@@@@@@@@@
+think ansi(h,Installing +top commands...)
+
+@set %ve=top`reset-first:[default(%ve/top`reset-first,secs())]
+@set %ve=top`reset-last:[default(%ve/top`reset-last,secs())]
+
+
+&top`cmd.top %vd=$^\+top(/t(?\:o(?\:t(?\:a(?\:ls?)?)?)?)?)?(?\: (.+))?$: @nspemit/silent %#=switch(%2,,ufun(%ve/top`fun.top,10,t(strlen(%1))),switch(bound(%2,1,25),%2,ufun(%ve/top`fun.top,%2,t(strlen(%1))),ufun(%ve/tag,top)[if(pmatch(%2),ufun(%ve/top`fun.top-player,%2,t(strlen(%1))),Must be a number between 1 and 25 or a player.)]))
+@set %vd/top`cmd.top=regexp
+
+&top`fun.top %ve=setq(0,add(config(player_name_len),2))[setq(1,add(%q0,17),2,if(%1,total,current))][ufun(%ve/header,,%q1)]%r[center(TOP %0 CONNECT [if(%1,TOTAL,TIME)][switch(%0,1,,S)],%q1)]%r[center(if(%1,Connect Times since [timefmt($b $d\, $Y,get(%ve/top`reset-first))],Last Reset [timefmt($x $X,get(%ve/top`reset-last))]),%q1)]%r[ufun(%ve/divider,%q1)]%r[iter(extract(revwords(sortkey(top`fun.top-time,lsearch(all,type,player))),1,%0),%b[ljust(name(##)%b,%q0,.)][timestring(ufun(top`fun.top-time,##),2)],,%r)]%r[ufun(%ve/footer,,%q1)]
+
+&top`fun.top-player %ve=name(pmatch(%0)) has been connected for [setq(2,if(%1,total,current))][timestring(ufun(top`fun.top-time,pmatch(%0)))] [if(%1,in total,this month)].
+
+&top`fun.top-time %ve=lmath(add,max(default(%0/top`%q2,0),0) [switch(1,hidden(%0),0,eq(conn(%0),-1),0,conn(%0))])
+
+@@ @@@@@@@@@@
+&top`trg.top-counter %vb=@wait/until [convtime(switch(timefmt($m $Y,default(top`reset-last,secs())),12 *,XXX Jan 01 00:00:01 [inc(last(#$))],XXX [elements(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec,inc(first(#$)))] 01 00:00:01 [last(#$)]))]=@trigger me/top`trg.top-reset
+
+&top`trg.top-reset %vb=THINK {[null(iter(lsearch(all,type,player),attrib_set(##/top`total,add(default(##/top`total,0),max(0,default(##/top`current,0)),max(conn(##),0)))[attrib_set(##/top`current,switch(conn(##),-1,0,-#$))],,{}))][attrib_set(me/top`reset-last,secs())]} ; @trigger me/top`trg.top-counter
+
+&top`adisconnect %vb=switch(%1,0,attrib_set(%#/top`current,add(default(%#/top`current,0),sub(secs(),convtime(get(%#/last))))))
+
+@@ @@@@@@@@@@
+think ansi(h,Adding Startup attributes...)
+
+&top`trg`top-counter %vs=%vb,top`trg.top-counter
+&top`attr`top %vs=mortal_dark no_command no_inherit no_clone wizard
+
+@@ @@@@@@@@@@
+think ansi(h,Adding package to the Core...)
+
++TMCS/ADDPACKAGE top=+Top/1.3/System for monitoring player activity (length of connects) on a monthly, and overall, basis/\[+TOP\]%b
+
+@@ @@@@@@@@@@
+think ansi(h,Installation complete.)
+
+

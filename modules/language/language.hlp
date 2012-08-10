@@ -1,0 +1,213 @@
+& TMCS LANG
+& LANGUAGES
+
+  The +Language system allows you to speak in different languages. Only
+  players who speak the language will be able to understand what you say.
+
+  The following language commands are available to all players:
+  +SPEAK, +TEACHERS, +LANGUAGES
+
+  These commands are only available to admins, or to some players:
+  +TEACH, +MAKETEACHER, +SETFLUENCY, +ADDLANG
+
+  These functions are available in the language system:
+  LANG()
+
+  The language system uses these flags:
+  LINGUIST, TEACHER
+
+  See also: LANGUAGE FLUENCIES
+& +SPEAK
+
+  +SPEAK <language>[:<fluency>]=<message>
+
+  This command allows you to speak in different languages. Depending on how
+  fluently you speak the language, and on how well the people hearing you
+  speak know it, some or all parts of the message may be elided.
+
+  Normally, when you use +Speak, you speak with your actual fluency in the
+  language. If you wish to feign a lower ability, you can give a <fluency>
+  to speak in (see HELP LANGUAGE FLUENCIES).
+
+  If <message> starts with a :, ; or | it will be posed, semiposed or
+  emitted, respectively.
+
+  Only text within "quote marks" is spoken in the language; everything else
+  is left unchanged.
+
+  See also: LANGUAGES
+& +TEACHERS
+
+  +TEACHERS
+
+  This command lists all the players on the game who are registered as
+  teachers and who are able to teach you a language. Note that the teachers
+  listed will not necessarily know or be fluent in every language.
+
+  See also: +MAKETEACHER
+& +LANGUAGES
+
+  +LANGUAGES [<player>]
+  +LANGUAGES/ALL
+
+  This command lists all the languages you know, and your approximate fluency
+  in each. Admins can specify a <player> to see the languages he knows, as
+  well as his exact fluency in each.
+
+  If the /all switch is given, all languages in the system are shown.
+
+  See also+ SETFLUENCY
+& +TEACH
+
+  +TEACH <player>=<language>
+
+  This command can be used by registered teachers to teach <language> to
+  <player>. Players can only be taught once every real-life week. In order to
+  teach someone, you must be in the same location as them, and have at least
+  Advanced fluency in the language, among other things.
+
+  It takes time to learn a language; you'll probably need to be taught several
+  times before you notice an increase in your fluency on +LANGUAGES, or before
+  you start speaking or understanding things said in the language better.
+
+  See also: +MAKETEACHER, +SETFLUENCY
+& +MAKETEACHER
+
+  +MAKETEACHER <player>
+
+  This command, which can only be used by admins, toggles the teacher status
+  of a given <player>. Making someone a teacher allows them to use the +TEACH
+  command, but it does not improve their skill in any language.
+& +SETFLUENCY
+
+  +SETFLUENCY <player>=<language>/<number>
+
+  This command sets the fluency with which <player> speaks and understands
+  <language> to <number>. For more information, see HELP LANGUAGE FLUENCIES.
+  The command can only be used by admins.
+
+  See also: +TEACHERS, +MAKETEACHER, +LANGUAGES
+& LANG()
+
+  LANG(<text>,<language>,<accuracy>,<reader>[,<display-word>])
+
+  This function is designed for use in descriptions and other text to
+  represent written language. <text> is the written text; anything between
+  quotation marks is taken as being written in the language. <language>
+  is the name of the language (as per +LANGUAGES) the text is written in.
+  <accuracy> is how well the text is written; see HELP LANGUAGE FLUENCIES.
+  <reader> is the name or dbref of the object trying to read the text.
+  Should the text be too unclear, or the reader's ability too low, to
+  understand the text, "UNINTELLIGIBLE <display-word>" is shown instead, and
+  defaults to "WRITING".
+
+  For examples, see HELP LANG2.
+& LANG2
+
+  Example:
+  @describe Book=A dusty book, bound in red leather. Written on the cover in
+    a neat, flowing script are the words [lang("The Complete Works of Charles
+    Dickens", English, 1000, %#, TEXT)]
+
+  Someone who speaks no English would see, when looking at the book:
+  A dusty book, bound in red leather. Written on the cover in a neat, flowing
+  script are the words "<UNINTELLIGIBLE TEXT>"
+
+  Someone who speaks a very small amount of English would see, in place of
+  <UNINTELLIGIBLE TEXT>, the string <TEXT IN English>. And someone with a
+  slightly higher fluency in the language may see something along the lines
+  of "The ... ... of Charles ...".
+& LINGUIST
+
+  Flag: LINGUIST (all types)
+
+  This flag, when set on an object, allows it to understand everything, in
+  any language, said with the +speak command. It's intended for players or
+  things which are logging a RP, so the log is complete.
+
+  See also: LANGUAGES
+& TEACHER
+
+  Flag: TEACHER (players)
+
+  Players set with this flag are registered teachers, and can use the
+  +teach command. This flag should not be set or cleared directly; instead,
+  the +MAKETEACHER command should be used.
+
+  See also: LANGUAGES, +TEACHERS
+& LANGUAGE FLUENCIES
+
+  There are nine levels of fluency in the language system:
+  None (0), Basic (1-100), Elementary (101-200), Intermediate (201-300),
+  Conversational (301-400), Advanced (401-500), Proficient (501-600),
+  Nearly Fluent (601-700), and Fluent (701-1000).
+
+  The more fluent you are in any given language, the better you'll be able
+  to speak it, and the better you can understand others who are speaking it.
+
+  The <fluency> argument to +SPEAK expects one of the word levels (or an
+  abbreviation of it). +SETFLUENCY, and the <accuracy> argument to LANG(),
+  expect a number between 0 and 1000, with 0 being no fluency whatsoever, and
+  800 and above being perfectly fluent.
+& +ADDLANG
+
+  +ADDLANG <language>
+
+  This admin-only command adds a new language to the language system.
+  After this is done, it is necessary to use +SETFLUENCY to give at least
+  one person the ability to speak the language, before it can be used.
+& +DELLANG
+
+  +DELLANG <language>
+
+  This wizard-only command deletes a language from the language system
+  completely, including removing all player fluencies in the language.
+  It cannot be undone; use with caution.
+& LANGUAGE CHANGES
+& LANGUAGE 1.3b
+
+  Version 1.3b - August 2011
+  * Typo where an attribute was looked for on the wrong object fixed.
+  * Help fix.
+
+& LANGUAGE 1.3
+
+  Version 1.3 - October 12 2008
+  * Added +dellang. Requested by Sexy Neko Hibiki.
+  * Commands now use locate() instead of pmatch() for player name
+    matching to avoid mistakes when people, for instance, "+maketeacher me".
+
+& LANGUAGE 1.2d
+& LANGUAGE 1.2c
+& LANGUAGE 1.2b
+& LANGUAGE 1.1
+
+  Version 1.2d - August 20 2008
+  * Bug in +speak when a <fluency> was given fixed. Also, +languages/all
+    was broken by the @hook on +languages. Reported by Sexy Neko Hibiki.
+
+  Version 1.2c - October 13 2007
+  * Some bugs in the @startup for the language system fixed. Reported by
+    Matthew Stockfleth.
+
+  Version 1.2b - September 14 2007
+  * It's now possible to learn the language by hearing it, as well as
+    speaking it. Suggested by Abdapa at Arabian Moons.
+  * +languages/all. Suggested by Abdapa at Arabian Moons.
+
+  Version 1.1 - July 23 2007
+
+  * Converted to TMCS.
+  * Fixed bug in initial learning.
+  * Added +addlang command.
+  * Some help fixes.
+
+& LANGUAGE v1.0
+
+  Version 1.0 - 28 June 2007
+  * Initial release.
+
+
+& 78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+

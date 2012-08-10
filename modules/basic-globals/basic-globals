@@ -1,0 +1,250 @@
+@@ @@@@@@@@@@
+@@ Basic Global Commands, by Talvo
+@@ A part of Talvo's MUSHcode Suite from www.talvo.com
+
+@@ @@@@@@@@@@
+think ansi(h,Installing Basic Globals code...)
+
+@@ @@@@@@@@@@
+@@ +WHO
+think ansi(h,Installing +WHO...)
+
+&globals`cmd.who %vd=$^\+who(?\:/(.*?))?(?\: +(.+?))?$: @nspemit/silent %#=ufun(%ve/globals`fun.who,%1,%2)
+@set %vd/globals`cmd.who=regexp
+
+@@ %0 = switch, %1 = arg
+&globals`fun.who %ve=switch(0,setr(9,ufun(globals`fun.who-findswitch,%0)),\[+WHO\] Unknown switch.,ufun(%ve/header,mudname() +Who)[setq(7,1,2,lwho(%#),0,%1)][switch(%q9,2,if(strlen(%q0),setq(2,filterbool(globals`fun.who`attrs-filter,%q2))),null(ufun(globals`fun.who`switches`%q8`prep,%1)[if(%q7,setq(2,filterbool(globals`fun.who`switches`%q8,%q2)))]))]%r[left(iter(ufun(globals`fun.who`fields-top),ljust(first(%i0,:),rest(%i0,:)),%b,%b),78)]%r[ufun(%ve/divider)]%r[map(%!/globals`fun.who`fields-sub,%q2,,%r)]%r[ufun(%ve/footer)])
+
+&globals`fun.who-findswitch %ve=switch(0,strlen(%0),setq(8,name)1,not(strlen(setr(8,grab(v(globals`fun.who`switches),%0*)))),1,not(strlen(setr(8,grab(v(globals`fun.who`attrs),%0*)))),2,0)
+
+&globals`fun.who`parselist %ve=edit(squish(iter(%0,if(hasattr(me,globals`fun.who`parselist`[first(%i0,:)]),edit(v(globals`fun.who`parselist`[first(%i0,:)]),JUST,switch(last(%i0,:),-*,rjust,ljust),SIZE,abs(last(%i0,:)),ELEM,decompose(stripansi(edit(elements(%i0,2,:),|,,%r,))))),,|)|),|,%b)
+&globals`fun.who`parselist`name %ve=[JUST(left(name(%0),SIZE),SIZE)]
+&globals`fun.who`parselist`accname %ve=[JUST(left(accname(%0),SIZE),SIZE)]
+&globals`fun.who`parselist`conn %ve=[JUST(left(squish(first(timestring(conn(%0)))),SIZE),SIZE)]
+&globals`fun.who`parselist`idle %ve=[JUST(left(squish(first(timestring(idle(%0)))),SIZE),SIZE)]
+&globals`fun.who`parselist`loc %ve=[JUST(left(if(findable(%#,%0),name(loc(%0)),Unfindable),SIZE),SIZE)]
+&globals`fun.who`parselist`room %ve=[JUST(left(if(findable(%#,%0),name(room(loc(%0))),Unfindable),SIZE),SIZE)]
+&globals`fun.who`parselist`attr %ve=[JUST(left(get(%0/ELEM),SIZE),SIZE)]
+&globals`fun.who`parselist`uattr %ve=[JUST(left(ulocal(%0/ELEM),SIZE),SIZE)]
+
+&globals`fun.who`attrs-filter %ve=match(get(%0/%q8),%q0*)
+
+&globals`fun.who`switches %ve=active here name
+
+&globals`fun.who`switches`active %ve=lte(idle(%0),%q0)
+&globals`fun.who`switches`active`prep %ve=setq(0,switch(stringsecs(%0),#-*,300,0,300,#$))
+
+&globals`fun.who`switches`here %ve=cand(findable(%#,%0),strmatch(room(%0),%q0))
+&globals`fun.who`switches`here`prep %ve=setq(2,setinter(%q2,lcon(%L)),0,room(%#),7,1)
+
+&globals`fun.who`switches`name %ve=strmatch(name(%0),%q0*)
+&globals`fun.who`switches`name`prep %ve=switch(%0,,setq(7,0),setq(0,%0))
+
+&globals`fun.who`fields-top %ve=Name:[config(player_name_len)] Conn:4 Idl:3 Who:3 Race:15 Location:31
+
+&globals`fun.who`fields %ve=name:16 conn:-4 idle:-3 attr:status:3 attr:race:15 loc:31
+
+&globals`fun.who`attrs %ve=STATUS RACE
+
+&globals`fun.who`fields-sub %ve=[ljust(left(name(%0),16),16)] [rjust(left(squish(first(timestring(conn(%0)))),4),4)] [rjust(left(squish(first(timestring(idle(%0)))),3),3)] [ljust(left(get(%0/status),3),3)] [ljust(left(get(%0/race),15),15)] [ljust(left(if(findable(%#,%0),name(loc(%0)),Unfindable),31),31)] 
+
+@@ @@@@@@@@@@
+@@ +TMCS/WHO <field>[=<value>]
+&globals`cmd.who-config %vd=$^\+tmcs/who (.+?)(=(.*))?$: @nspemit/silent %#=ufun(%ve/tag,core)[switch(0,strlen(%2),ufun(%ve/globals`fun.who-config-show,%1),ufun(%ve/globals`fun.who-config-set,%1,%3))]
+@set %vd/globals`cmd.who-config=regexp
+
+&globals`fun.who-config-show %ve=switch(0,strlen(setr(0,grab(|[v(globals`fun.who-config-fields)],%0*,|))),No such field. Must be one of [itemize(v(globals`fun.who-config-fields),|,or)].,hasattrval(%ve,globals`fun.who`%q0),The '%q0' field for +Who is not set.,The '%q0' field for +Who is set to:%r%b%b[get(%ve/globals`fun.who`%q0)])
+
+&globals`fun.who-config-set %ve=switch(0,orflags(%#,Wr),Permission denied.,strlen(setr(0,grab(|[v(globals`fun.who-config-fields)],%0*,|))),No such field. Must be one of [itemize(v(globals`fun.who-config-fields),|,or)].,strlen(%1),Field '%q0' cleared. [if(hasattrval(%ve,globals`fun.who`%q0),Previously set to: [get(%ve/globals`fun.who`%q0)])][attrib_set(%ve/globals`fun.who`%q0)],Field '%q0' changed:%r%bFrom: [default(%ve/globals`fun.who`%q0,<Not Set>)]%r%bTo:%b %b%1[attrib_set(%ve/globals`fun.who`%q0,%1)][switch(%q0,fields,attrib_set(%ve/globals`fun.who`fields-sub,ufun(globals`fun.who`parselist,%1)))])
+
+&globals`fun.who-config-fields %ve=attrs|fields|fields-top
+
+@@ @@@@@@@@@@
+@@ +QWHO
+think ansi(h,Installing +QWHO...)
+
+&globals`cmd.qwho %vd=$^\+[3q]who(?\:/(.*))?$: @nspemit/silent %#=switch(grab(namei conn idle,%1*),,\[+QWHO\] Unknown switch.,ufun(%ve/globals`fun.qwho,#$))
+@set %vd/globals`cmd.qwho=regexp
+
+&globals`fun.qwho %ve=ufun(%ve/header,QUICK WHO LIST)%r[table(iter(sort(setr(0,lwho(%#)),%0),switch(idle(##),<300,ansi(h,name(##)),name(##)) \([squish(first(timestring(idle(##))))]\),,|),add(config(player_name_len),7),width(%#),|)]%r[ufun(%ve/footer,capstr(spellnum(words(%q0))) \([words(%q0)]\) Player[switch(%q0,* *,s)] online)]
+
+@@ @@@@@@@@@@
+@@ +WHERE
+think ansi(h,Installing +WHERE...)
+
+&globals`cmd.where %vd=$^\+where(?\:/(.*))?$: @nspemit/silent %#=switch(grab(room loc,%1*),,\[+WHERE\] Unknown switch.,ufun(%ve/globals`fun.where,#$))
+@set %vd/globals`cmd.where=regexp
+
+&globals`fun.where %ve=setq(1,iter(setr(0,edit(setunion(lwho(%#),),%b,|)),if(findable(%#,##),name(%0(##)),Unfindable),|,|))[ufun(%ve/header,+Where)]%r[iter(setunion(%q1,,|),ljust(left(itext(0),30),31): [ufun(globals`fun.where-sub,elements(%q0,matchall(%q1,itext(0),|,%b),|),45,33)],|,%r)]%r[ufun(%ve/footer)]
+
+&globals`fun.where-sub %ve=edit(wrap(edit(iter(sort(%0,namei,|),name(##),|,|),%b,*,|,\,%b),%1,%1,%r[space(%2)]),*,%b)
+
+@@ @@@@@@@@@@
+@@ +OS / OOC / +OOC / ' (ooc speech). On Wiz object for @verb
+think ansi(h,Installing +OS...)
+
+&globals`cmd.ooc-speech %va=$^(?\:(?\:\+?o(?\:s|oc) )|')([\:;"])?(.*)$: @break hasflag(%#,gagged)=@nspemit/silent %#=You can't do that while gagged. ; @assert cor(elock(%L/speak,%#),hasflag(%#,LOUD))=You may not speak here! ; @verb %ve=%#,globals`msg.ooc-speech-you,,globals`msg.ooc-speech-others,,,%2,firstof(%1,")
+@set %va/globals`cmd.ooc-speech=regexp
+
+&globals`msg.ooc-speech-you %ve=ansi(h,<OOC>) [switch(%1,",You say\, "%0",;,%n%0,%n %0)]
+&globals`msg.ooc-speech-others %ve=ansi(h,<OOC>) [switch(%1,",%n says\, "%0",;,%n%0,%n %0)]
+@set %ve/globals`msg.ooc-speech-others=noname
+
+@@ @@@@@@@@@@
+@@ +DISPLAY
+think ansi(h,Installing +DISPLAY...)
+
+&globals`cmd.display %va=$+display *: @nspemit/silent %#=switch(%0,*/*,ufun(%vb/globals`fun.display-attr,before(%0,/),after(%0,/)),ufun(%ve/globals`fun.display-list,%0))
+
+&globals`fun.display-attr %vb=setq(0,\[+DISPLAY\]%b)[switch(0,t(setr(1,locate(%#,%0,ERTP*))),%q0I can't see that here.,visible(%#,%q1/%1),%q0No such attribute.,ufun(%ve/header,name(%q1)\(%q1\)'s [ucstr(%1)])%r[objeval(%#,ufun(%q1/%1))]%r[ufun(%ve/footer)])]
+
+&globals`fun.display-list %ve=\[+DISPLAY\] [switch(0,t(setr(0,locate(%#,%0,ERTP*))),I can't see that here.,words(setr(1,filter(#lambda/visible(%#\,%q0/%%0),lattr(%q0/**)))),name(%q0)\(%q0\) has no visible attributes set.,name(%q0)\(%q0\) has the following visible attributes: %q1)]
+
+@@ @@@@@@@@@@
+@@ +NEWBIES and +OLDBIES
+think ansi(h,Installing +NEWBIES/+OLDBIES...)
+
+&globals`cmd.oldbies %vd=$+oldbies: @nspemit/silent %#=ufun(%ve/globals`fun.bies,1,Oldbies)
+&globals`cmd.newbies %vd=$+newbies: @nspemit/silent %#=ufun(%ve/globals`fun.bies,0,Newbies)
+
+&globals`fun.bies %ve=ufun(%ve/header,%1,setr(0,add(19,setr(1,max(24,add(config(player_name_len),3))))))%r[iter(extract(switch(sort(lwho(%#),ctime),*,if(%0,#$,revwords(#$))),1,15),rjust(#@,3)%b [ljust(name(##)%b,%q1,.)] [elements(ctime(##),2 3 5)],,%r)]%r[ufun(%ve/footer,,%q0)]
+
+@@ @@@@@@@@@@
+@@ COUNT
+think ansi(h,Installing COUNT...)
+
+&globals`cmd.count %vd=$count *: @nspemit/silent %#=switch(0,t(setr(0,locate(%#,first(%0,/),X*))),No such object '[first(%0,/)]'!,Mismatches on [name(%q0)]\(%q0\):%r[switch(setr(0,squish(iter(lattr(%q0/[switch(%0,*/*,after(%0,/),**)]),if(visible(%#,%q0/%i0),switch(elements(setr(1,brackets(get(%q0/%i0))),1 3 5),elements(%q1,2 4 6),,%i0 (%q1))),,%r),%r)),,No mismatches!,%q0)])
+
+@@ @@@@@@@@@@
+@@ +STAFF
+think ansi(h,Installing +STAFF...)
+
+&globals`cmd.staff %vd=$+staff: @nspemit/silent %#=ufun(%ve/globals`fun.staff)
+&globals`cmd.admins %vd=$+admins: @nspemit/silent %#=ufun(%ve/globals`fun.staff)
+
+&globals`fun.staff %ve=ufun(%ve/header,Staff List)%r[setq(0,lwho(%#))][ljust(Name,18)][ljust(Idl,4)][ljust(Comments,56)]%r[ufun(%ve/divider)]%r[iter(sort(setr(1,ulocal(%ve/globals`fun.staff`list)),namei),ljust(name(##),18)[if(member(%q0,##),rjust(squish(first(timestring(idle(##)))),3),Off)]%b[left(ulocal(globals`fun.staff`comments,##),56)],,%r)]%r[ufun(%ve/footer,switch(setinter(%q0,%q1),,No Admins,* *,capstr(spellnum(words(#$))) Admins,One Admin) Online)]
+
+&globals`fun.staff`list %ve=setdiff(lsearch(all,eplayer,orflags\(##\,Wr\)),#1)
+&globals`fun.staff`comments %ve=get(%0/DUTIES)
+
+@@ @@@@@@@@@@
+@@ +TMCS/STAFF <field>[=<value>]
+&globals`cmd.staff-config %vd=$^\+tmcs/staff (.+?)(=(.*))?$: @nspemit/silent %#=ufun(%ve/tag,core)[switch(0,hasflag(%#,Wizard),Permission denied.,strlen(%2),ufun(%ve/globals`fun.staff-config-show,%1),ufun(%ve/globals`fun.staff-config-set,%1,%3))]
+@set %vd/globals`cmd.staff-config=regexp
+
+&globals`fun.staff-config-show %ve=switch(0,strlen(setr(0,grab(|[v(globals`fun.staff-config-fields)],%0*,|))),No such field. Must be one of [itemize(v(globals`fun.staff-config-fields),|,or)].,hasattrval(%ve,globals`fun.staff`%q0),The '%q0' field for +Staff is not set.,The '%q0' field for +Staff is set to:%r%b%b[get(%ve/globals`fun.staff`%q0)])
+
+&globals`fun.staff-config-set %ve=switch(0,strlen(setr(0,grab(|[v(globals`fun.staff-config-fields)],%0*,|))),No such field. Must be one of [itemize(v(globals`fun.staff-config-fields),|,or)].,strlen(%1),Field '%q0' cleared. [if(hasattrval(%ve,globals`fun.staff`%q0),Previously set to: [get(%ve/globals`fun.staff`%q0)])][attrib_set(%ve/globals`fun.staff`%q0)],Field '%q0' changed:%r%bFrom: [default(%ve/globals`fun.staff`%q0,<Not Set>)]%r%bTo:%b %b%1[attrib_set(%ve/globals`fun.staff`%q0,%1)])
+
+&globals`fun.staff-config-fields %ve=list|comments
+
+
+@@ @@@@@@@@@@
+@@ +FINGER
+think ansi(h,Installing +FINGER...)
+
+&globals`cmd.finger %vd=$+finger *: @nspemit/silent %#=ufun(%ve/globals`fun.finger,%0)
+
+&globals`fun.finger %ve=switch(locate(%#,%0,PFamy),#-*,\[+FINGER\] I'm not sure who you mean.,ufun(globals`fun.finger-sub,#$,width(%#,78),sub(div(width(%#,78),2),1),t(member(lwho(%#),#$))))
+
+@@ %0 = dbref of person being checked, %1 = overall width, %2 = half of overall width, %3 = is person online?
+&globals`fun.finger-sub %ve=ufun(%ve/header,+FINGER [ucstr(name(%0))])%r%r[setq(0,table(squish(ulocal(globals`fun.finger-sub-short,%0,%3),|),%2,%1,|))][setq(1,iter(squish(ulocal(globals`fun.finger-sub-long,%0,%3),|),left(%i0,%1),|,%r))][setq(2,iter(squish(ulocal(globals`fun.finger-sub-paragraph,%0,%3),|),%i0,|,%r))][setq(3,iter(0 1 2,if(strlen(r(%i0)),%i0)))][iter(%q3,r(%i0),,%r)]%r%r[ufun(%ve/footer)]
+
+&globals`fun`finger`short %ve=name|loc|connidle|last|uattr:lastoff:Last Off|attr:status
+&globals`fun`finger`long %ve=attrv:website|attrv:email
+&globals`fun`finger`paragraph %ve=attrv:notes|uattrv:bio
+&globals`fun.finger-sub-short %ve=[ansi(h,NAME:)] [name(%0)]|[ansi(h,LOC:)] [if(findable(%#,%0),name(loc(%0)),Unfindable)]|[if(%1,[ansi(h,ON FOR/IDLE:)] [squish(timestring(conn(%0)))]/[squish(timestring(idle(%0)))])]|[if(%1,,[ansi(h,LAST:)] :[if(hasattrval(%0,last),get(%0/last) ([squish(first(timestring(sub(secs(),convtime(get(%0/last))))))] ago),Never Connected)])]|[ansi(h,LAST OFF:)] [edit(uldefault(%0/lastoff,None),|,,%r)]|[ansi(h,STATUS:)] [edit(default(%0/status,None),|,,%r)]
+&globals`fun.finger-sub-long %ve=[if(hasattrpval(%0,notes),[ansi(h,NOTES:)] [edit(get(%0/notes),|,,%r,)])]|[if(hasattrpval(%0,website),[ansi(h,WEBSITE:)] [edit(get(%0/website),|,,%r,)])]|[if(hasattrpval(%0,email),[ansi(h,EMAIL:)] [edit(get(%0/email),|,,%r,)])]
+
+&globals`fun.finger-parselist %ve=localize(iter(%0,if(hasattr(me,globals`fun.finger-parselist`[first(%i0,:)]),edit(v(globals`fun.finger-parselist`[first(%i0,:)][if(hasattr(me,globals`fun.finger-parselist`[first(%i0,:)]`%1),`%1)]),ELEM2,decompose(elements(%i0,2,:)),LABEL,ulocal(globals`fun.finger-label,switch(%i0,*attr*:*:*,decompose(after(after(%i0,:),:)),*attr*:*,decompose(capstr(lcstr(after(%i0,:)))),*:*,decompose(after(%i0,:)),accname,Name,connidle,On For/Idle,capstr(lcstr(first(%i0,:))))))),|,|))
+&globals`fun.finger-parselist`name %ve=LABEL[name(%0)]
+&globals`fun.finger-parselist`accname %ve=LABEL[accname(%0)]
+&globals`fun.finger-parselist`idle %ve=[if(%1,LABEL[squish(timestring(idle(%0)))])]
+&globals`fun.finger-parselist`conn %ve=[if(%1,LABEL[squish(timestring(conn(%0)))])]
+&globals`fun.finger-parselist`connidle %ve=[if(%1,LABEL[squish(timestring(conn(%0)))]/[squish(timestring(idle(%0)))])]
+&globals`fun.finger-parselist`last %ve=[if(%1,,LABEL:[if(hasattrval(%0,last),get(%0/last) ([squish(first(timestring(sub(secs(),convtime(get(%0/last))))))] ago),Never Connected)])]
+&globals`fun.finger-parselist`loc %ve=LABEL[if(findable(%#,%0),name(loc(%0)),Unfindable)]
+&globals`fun.finger-parselist`attr %ve=LABEL[edit(default(%0/ELEM2,None),|,,%r)]
+&globals`fun.finger-parselist`uattr %ve=LABEL[edit(uldefault(%0/ELEM2,None),|,,%r)]
+&globals`fun.finger-parselist`attrv %ve=[if(hasattrpval(%0,ELEM2),LABEL[edit(get(%0/ELEM2),|,,%r,)])]
+&globals`fun.finger-parselist`uattrv %ve=[if(hasattrpval(%0,ELEM2),LABEL[edit(ulocal(%0/ELEM2),|,,%r,)])]
+
+&globals`fun.finger-parselist`attr`paragraph %ve=LABEL[edit(default(%0/ELEM2,None),|,)]
+&globals`fun.finger-parselist`uattr %ve=LABEL[edit(default(%0/ELEM2,None),|,)]
+&globals`fun.finger-parselist`attrv %ve=[if(hasattrpval(%0,ELEM2),LABEL[edit(get(%0/ELEM2),|,)])]
+&globals`fun.finger-parselist`uattrv %ve=[if(hasattrpval(%0,ELEM2),LABEL[edit(ulocal(%0/ELEM2),|,)])]
+
+
+&globals`fun.finger-label %ve=\[ansi(h,[decompose(stripansi(ucstr(edit(%0,|,,%r,))))]:)]%b
+
+@@ @@@@@@@@@@
+@@ +TMCS/FINGER <field>=<value>
+
+&globals`cmd.finger-config %vd=$^\+tmcs/finger (.+?)(?\:=(.*))$: @nspemit/silent %#=ufun(%ve/tag,core)[switch(0,hasflag(%#,Wizard),Permission denied.,strlen(%2),ufun(%ve/globals`fun.finger-config-show,%1),ufun(%ve/globals`fun.finger-config-set,%1,%2))]
+@set %vd/globals`cmd.finger-config=regexp
+
+&globals`fun.finger-config-show %ve=switch(0,strlen(setr(0,grab(|[v(globals`fun.finger-config-fields)],%0*,|))),No such field. Must be one of [itemize(v(globals`fun.finger-config-fields),|,or)].,hasattrval(%ve,globals`fun.finger`%q0),The '%q0' field for +Finger is not set.,The '%q0' field for +Finger is set to:%r%b%b[get(%ve/globals`fun.finger`%q0)])
+
+&globals`fun.finger-config-set %ve=switch(0,strlen(setr(0,grab(|[v(globals`fun.finger-config-fields)],%0*,|))),No such field. Must be one of [itemize(v(globals`fun.finger-config-fields),|,or)].,strlen(%1),Field '%q0' cleared. [if(hasattrval(%ve,globals`fun.finger`%q0),Previously set to: [get(%ve/globals`fun.finger`%q0)])][attrib_set(%ve/globals`fun.finger`%q0)][attrib_set(%ve/globals`fun.finger-sub-%q0)],Field '%q0' changed:%r%bFrom: [default(%ve/globals`fun.finger`%q0,<Not Set>)]%r%bTo:%b %b%1[attrib_set(%ve/globals`fun.finger`%q0,%1)][attrib_set(%ve/globals`fun.finger-sub-%q0,ufun(globals`fun.finger-parselist,%1))])
+
+&globals`fun.finger-config-fields %ve=short|long|paragraph
+
+@@ @@@@@@@@@@
+@@ +SELFBOOT
+think ansi(h,Installing +SELFBOOT...)
+
+&globals`cmd.selfboot %va=$+selfboot: @force %#=@boot/me
+
+@@ @@@@@@@@@@
+@@ +POLL
+think ansi(h,Installing +POLL...)
+
+&globals`cmd.poll-check %vd=$+poll: @nspemit/silent %#=ufun(%ve/globals`fun.poll-check)
+&globals`cmd.poll-set %vd=$+poll *: @nspemit/silent %#=ufun(%ve/globals`fun.poll-set,%0) ; @assert strlen(%q9) ; @poll %q9
+&globals`cmd.poll-back-noarg %vd=$+poll/back: @nspemit/silent %#=ufun(%ve/globals`fun.poll-back,10)
+&globals`cmd.poll-back-arg %vd=$+poll/back *: @nspemit/silent %#=ufun(%ve/globals`fun.poll-back,%0)
+&globals`cmd.poll-delete %vd=$+poll/delete *: @nspemit/silent %#=ufun(%ve/globals`fun.poll-delete,%0) ; @poll %q9
+
+@@ Poll format:
+@@ poll`<secs> %vb=<msg>
+@@ poll`<secs>`name %vb=<name of player setting poll>
+@@ poll`<secs>`who %vb=%:
+
+&globals`fun.poll-check %ve=\[+POLL\] [switch(ufun(globals`fun.poll-last),,There have been no polls.,The last poll was set on [timefmt($a $b $d at $H:$M:$S,#$)] by [v(globals`poll`#$`name)]\([if(num(v(globals`poll`#$`who)),num(v(globals`poll`#$`who)),#-1)]\): [v(globals`poll`#$)])]
+
+&globals`fun.poll-set %ve=\[+POLL\] [switch(setq(0,ufun(globals`fun.poll-last))0,comp(%:,v(globals`poll`%q0`who),d),You cannot set two polls in a row.,gte(setr(1,sub(secs(),firstof(%q0,0))),900),It's too soon to change the poll. Try again in about [squish(first(timestring(sub(900,%q1))))].,strlen(squish(%0)),What do you want to change the poll to?,lte(strlen(%0),38),That poll is [sub(strlen(%0),38)] character[switch(sub(strlen(%0),38),1,,s)] too long.,not(hasflag(%#,GAGGED)),You can't do that while gagged.,hastype(%#,PLAYER),Only players can change the poll.,not(hasflag(%#,POLLBANNED)),You aren't allowed to change the poll.,You change the poll.[ufun(globals`fun.poll-set-sub,%0)][setq(9,%0)][nspemit(lwho(),\[+POLL\] %n has changed the poll to: %0)])]
+
+&globals`fun.poll-set-sub %ve=null(attrib_set(me/globals`poll`[setr(0,secs())],%0)[attrib_set(me/globals`poll`%q0`name,%~)][attrib_set(me/globals`poll`%q0`who,%:)][iter(extract(revwords(sortkey(#lambda/last(%%0\,`),lattr(me/GLOBALS`POLL`*),n)),26,999),wipe(me/%i0))])
+
+&globals`fun.poll-back %ve=switch(0,t(setr(0,bound(%0,1,setr(1,nattr(%ve/GLOBALS`POLL`*))))),\[+POLL\] You must enter a number between 1 and 25.,ufun(%ve/header,LAST [switch(%q0,1,POLL,%q0 POLLS)])%r[iter(extract(revwords(sortkey(#lambda/last(%%0\,`),lattr(me/GLOBALS`POLL`*),n)),1,%q0),if(orflags(%#,Wr),rjust(last(%i0,`),10),ljust(timefmt($d $b $H:$M,last(%i0,`)),13))%b%b[ljust(v(%i0`name)\([if(num(v(%i0`who)),num(v(%i0`who)),#-1)]\),25)][v(%i0)],,%r)]%r[ufun(%ve/footer)])
+
+&globals`fun.poll-delete %ve=\[+POLL\] [switch(0,orflags(%#,Wr),Permission denied.,hasattr(me,GLOBALS`POLL`%0),There is no poll with that id. Check +POLL/BACK to see the id numbers.,wipe(me/globals`poll`%0)Poll cleared.[setq(9,default(me/globals`poll`[ufun(globals`fun.poll-last)],Doing))])]
+
+&globals`fun.poll-last %ve=last(sort(edit(lattr(me/GLOBALS`POLL`*),GLOBALS`POLL`,),n))
+
+@@ @@@@@@@@@@
+think ansi(h,Setting Startup attributes...)
+
+&globals`cmd`+who %vs=|%vd,globals`cmd.who
+&globals`cmd`+qwho %vs=|%vd,globals`cmd.qwho
+&globals`cmd`+where %vs=|%vd,globals`cmd.where
+&globals`cmd`+os %vs=|%va,globals`cmd.ooc-speech
+&globals`cmd`ooc %vs=|%va,globals`cmd.ooc-speech
+&globals`cmd`+ooc %vs=|%va,globals`cmd.ooc-speech
+&globals`cmd`+display %vs=|%va,globals`cmd.display
+&globals`cmd`+oldbies %vs=|%vd,globals`cmd.oldbies
+&globals`cmd`+newbies %vs=|%vd,globals`cmd.newbies
+&globals`cmd`count %vs=|%vd,globals`cmd.count
+&globals`cmd`+staff %vs=|%vd,globals`cmd.staff
+&globals`cmd`+admins %vs=|%vd,globals`cmd.admins
+&globals`cmd`+finger %vs=|%vd,globals`cmd.finger
+&globals`cmd`+selfboot %vs=|%va,globals`cmd.selfboot
+
+@@ @@@@@@@@@@
+think ansi(h,Installing onto the Core object...)
+
+
++TMCS/ADDPACKAGE globals=Globals/1.3/Basic Global Commands/
+
+think ansi(h,Upload complete. NOTE: Please have #1 run this command to finalise the installation: @FLAG/ADD POLLBANNED=,PLAYER,WIZARD,WIZARD)
+

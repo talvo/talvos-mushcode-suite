@@ -1,0 +1,213 @@
+@@ @@@@@@@@@@
+@@ Econ System, by Talvo
+@@ A part of Talvo's MUSHcode Suite from www.talvo.com
+
+@@ @@@@@@@@@@
+think ansi(h,Installing Econ commands...)
+
+@@ Sensible command structure?
+@@ /commodities
+
+@@ /addcommodity name=single,plural,patterns
+@@ /delcommodity name
+
+@@ /addcurrency curr=curr-long, single-for-denom-of-1, plural-for-denom-of-1, forms-for-denom-of-1
+@@ /delcurrency curr
+
+@@ /setdenoms curr=visible-denoms
+@@ /adddenom curr=denom/amount, denom/single, denom/plural, denom/forms
+@@ /deldenom curr=denom/amount
+
+@@ @@@@@@@@@@
+@@ +TMCS/ECON
+&econ`cmd.econ-config %va=$+tmcs/econ/*: @nspemit/silent %#=ufun(%ve/tag,core)[switch(0,hasflag(%#,wizard),Permission denied.,strlen(before(%0,%b)),You must provide a switch.,eq(words(setr(s,graball(edit(lattr(%vb/econ`fun.econ-config`*),ECON`FUN.ECON-CONFIG`,),before(%0,%b)*))),1),Unknown or ambiguous switch '[before(%0,%b)]'.,strmatch(after(%0,%b),get(%vb/econ`fun.econ-config`%qs`args),0 1 2 3 4 5 6 7 8 9),Invalid arguments.,ufun(%vb/econ`fun.econ-config`%qs,after(%0,%b)))] ; @break %qz={@nspemit/silent %#=ufun(%ve/tag,core)Setting command object NO_COMMAND and updating db. Please wait... ; @wait me={@set me=!NO_COMMAND ; @nspemit/silent %#=ufun(%ve/tag,core)DB updated. NO_COMMAND removed.} ; @set me=NO_COMMAND ; @dolist/notify lsearch(all,eval,hasattr\(##\,MONEY\))={&MONEY ##=[ldelete(get(##/MONEY),%qz,|)]}} ; @break %qy={@nspemit/silent %#=ufun(%ve/tag,core)Setting command object NO_COMMAND and updating db. Please wait... ; @wait me={@set me=!NO_COMMAND ; @nspemit/silent %#=ufun(%ve/tag,core)DB updated. NO_COMMAND removed.} ; @set me=NO_COMMAND ; @dolist/notify lsearch(all,eval,hasattr\(##\,MONEY\))={&MONEY ##=[insert(get(##/MONEY),%qy,0,|)]}}
+
+&econ`fun.econ-config`commodities %vb=Commodity List:%r[iter(get(%vi/econ`c),%i0 = [get(%vi/econ`c`%i0`plural)],|,%r)]
+&econ`fun.econ-config`commodities`args %vb=
+
+&econ`fun.econ-config`addcommodity %vb=switch(0,regmatch(%q0,^\[a-zA-Z0-9\]\{1\,25\}$),Invalid commodity name.,cand(strlen(setr(1,squish(%q1))),strlen(setr(2,squish(%q2))),strlen(setr(3,squish(%q3)))),Args cannot be empty.,Commodity %q0 [if(member(get(%vi/econ`c),setr(0,ucstr(%q0)),|),updated,attrib_set(%vi/ECON`C,squish(get(%vi/ECON`C)|%q0,|))added)].[attrib_set(%vi/ECON`C`%q0`SINGLE,%q1)][attrib_set(%vi/ECON`C`%q0`PLURAL,%q2)][attrib_set(%vi/ECON`C`%q0`FORMS,%q3)][setq(y,0[@@(No need to forcefully append to everyone's MONEY, since values at the end which aren't present are assumed to be 0)])])
+&econ`fun.econ-config`addcommodity`args %vb=*=*,*,*
+
+&econ`fun.econ-config`delcommodity %vb=switch(0,setr(z,member(get(%vi/ECON`C),setr(0,ucstr(%q0)),|)),No such commodity '%q0'.,Commodity '%q0' deleted.[wipe(%vi/econ`c`%q0)][attrib_set(%vi/econ`c,ldelete(get(%vi/econ`c),%qz,|))][setq(z,add(%qz,words(get(%vi/ECON`M),|)))])
+&econ`fun.econ-config`delcommodity`args %vb=*
+
+&econ`fun.econ-config`addcurrency %vb=switch(0,regmatch(setr(0,ucstr(%q0)),^\[a-zA-Z0-9\]\{1\,25\}$),Invalid currency name.,cand(strlen(setr(2,squish(%q2))),strlen(setr(3,squish(%q3))),strlen(setr(4,squish(%q4)))),Args cannot be empty.,Currency %q0 [if(member(get(%vi/econ`m),%q0,|),updated,attrib_set(%vi/ECON`M,squish(get(%vi/ECON`M)|%q0,|))[setq(y,words(get(%vi/ECON`M),|))]added)].[if(strlen(squish(%q1)),attrib_set(%vi/ECON`M`%q0`LONGNAME,squish(%q1)))][attrib_set(%vi/ECON`M`%q0`1`SINGLE,%q2)][attrib_set(%vi/ECON`M`%q0`1`PLURAL,%q3)][attrib_set(%vi/ECON`M`%q0`1`FORMS,%q4)][attrib_set(%vi/ECON`M`%q0,1)])
+&econ`fun.econ-config`addcurrency`args %vb=*=*,*,*,*
+
+&econ`fun.econ-config`delcurrency %vb=switch(0,setr(z,member(get(%vi/ECON`M),setr(0,ucstr(%q0)),|)),No such currency '%q0'.,Currency '%q0' deleted.[wipe(%vi/econ`m`%q0)][attrib_set(%vi/econ`m,ldelete(get(%vi/econ`m),%qz,|))])
+&econ`fun.econ-config`delcurrency`args %vb=*
+
+&econ`fun.econ-config`setdenoms %vb=switch(0,member(get(%vi/ECON`M),setr(0,ucstr(%q0)),|),No such currency '%q0'.,not(words(setr(b,iter(%q1,if(cand(isint(%i0),hasattr(%vi,ECON`M`%q0`%i0)),,%i0))))),Currency %q0 does not have a denomination '[first(%qb)]'.,Visible Denominations for currency %q0 set to: [attrib_set(%vi/ECON`M`%q0,setunion(%q1,1,,n))][get(%vi/ECON`M`%q0)])
+&econ`fun.econ-config`setdenoms`args %vb=*=*
+
+&econ`fun.econ-config`adddenom %vb=switch(0,member(get(%vi/ECON`M),setr(0,ucstr(%q0)),|),No such currency '%q0'.,regmatch(setr(1,squish(%q1)),^\[0-9\]+$),Invalid denomination.,%q1,Invalid denomination.,Denomination %q1 for currency %q0 [if(hasattr(%vi,ECON`M`%q0`%q1),updated,added)].[attrib_set(%vi/ECON`M`%q0`%q1`SINGLE,squish(%q2))][attrib_set(%vi/ECON`M`%q0`%q1`PLURAL,squish(%q3))][attrib_set(%vi/ECON`M`%q0`%q1`FORMS,squish(%q4))])
+&econ`fun.econ-config`adddenom`args %vb=*=*,*,*,*
+
+&econ`fun.econ-config`deldenom %vb=switch(0,member(get(%vi/ECON`M),setr(0,ucstr(%q0)),|),No such currency '%q0'.,isint(%q1),No such denomination '%q1'.,neq(%q1,1),You cannot delete denomination 1.,hasattr(%vi,ECON`M`%q0`%q1),No such denomination '%q1'.,Denomination deleted.[wipe(%vi/ECON`M`%q0`%q1)])
+&econ`fun.econ-config`deldenom`args %vb=*=*
+
+
+@@ @@@@@@@@@@
+@@ Utility functions:
+
+&econ`fun.valid-ints %ve=switch(words(regraball(%0,^\\d+$,|),|),<[words(%0,|)],@@(Some invalid input)0,>[add(words(get(%vi/econ`c),|),words(get(%vi/econ`m),|))],@@(Too many ints!)0,@@(All good. May be too short though, so remember to pad)1)
+
+&econ`fun.valid-words %ve=switch(%0,Nothing,1,localize(cand(regmatchi(%0,get(%ve/econ`fun.valid-words.sub)),lmath(setq(0,^\(\\Q[edit(iter(lattr(%vi/econ`c`**`forms) [lattr(%vi/econ`m`**`forms)],get(%vi/##),,|),|,\\E|\\Q,*,\\E.*\\Q,?,\\E.\\Q)]\\E\)$)mul,iter(squish(%0),regmatchi(regedit(%i0,^ *\[0-9\]+ *(.+?) *$,$1),%q0),\,,%b)))))
+&econ`fun.valid-words.sub %ve=^ *(\d+ *[^,]+?)( *, *\d+ *[^,]+)* *$
+
+@@ ints-to-words - convert an integer list of commodities to a list of words. Expects a valid list
+&econ`fun.ints-to-words %ve=localize(setq(9,edit(squish(iter(get(%vi/econ`M),ulocal(%ve/econ`fun.ints-to-words.cash,elements(%0,#@,|),revwords(setinter(regeditall(lattr(%vi/econ`M`%i0`*),\[^0-9 \],),get(%vi/econ`M`%i0),%b,n)),%i0),|,|)|[setq(0,get(%vi/econ`C))][iter(extract(%0,add(words(get(%vi/econ`M),|),1),words(%q0,|),|),switch(##,0,,1,1 [get(%vi/econ`c`[elements(%q0,#@,|)]`single)],## [get(%vi/econ`c`[elements(%q0,#@,|)]`plural)]),|,|)],|),|,\,%b))[switch(%q9,,Nothing,%q9)])
+
+&econ`fun.ints-to-words.cash %ve=setq(0,%0)[iter(%1,switchall(div(%q0,##),0,,1,1 [get(%vi/econ`m`%2`##`single)],>1,#$ [get(%vi/econ`m`%2`##`plural)],>0,setq(0,mod(%q0,##))),,|)]
+
+@@ words-to-ints - convert a written list of commodities to an int list. Expects a valid list.
+&econ`fun.words-to-ints %ve=localize(ufun(%ve/econ`fun.pad,switch(%0,Nothing,0,setq(0,squish(%0))[iter(get(%vi/econ`M),setq(2,0)[null(iter(remove(lattr(%vi/econ`M`%i0`*),ECON`M`%i0`LONGNAME),setq(3,,4,last(%i0,`),1,^\(\\Q[edit(get(%vi/%i0`forms),|,\\E|\\Q,*,\\E.*\\Q,?,\\E.\\Q)]\\E\)$)[iter(%q0,null(regmatchi(%i0,^ *(\[0-9\]+) *(.+?) *$,1:8 2:9))[if(regmatchi(%q9,%q1),setq(2,add(%q2,mul(%q4,%q8)))[setq(0,remove(%q0,%qi,\,))])],\,)]))]%q2,|,|)]|[iter(get(%vi/econ`c),setq(2,0,3,,1,^\(\\Q[edit(get(%vi/econ`c`%i0`forms),|,\\E|\\Q,*,\\E.*\\Q,?,\\E.\\Q)]\\E\)$)[null(iter(%q0,null(regmatchi(%i0,^ *(\[0-9\]+) *(.+?) *$,1:8 2:9))[if(regmatchi(%q9,%q1),setq(2,add(%q2,%q8))[setq(0,remove(%q0,%i0,\,))])],\,))]%q2,|,|)])))
+
+
+@@ pad - make a list of ints the right length. Expects a valid (though possibly short) list.
+&econ`fun.pad %ve=extract(squish(%0[repeat(|0|0,add(words(get(%vi/econ`c),|),words(get(%vi/econ`M),|)))],|),1,add(words(get(%vi/econ`c),|),words(get(%vi/econ`M),|)),|)
+
+@@ can-view - can %0 view the wallet of %1
+&econ`fun.can-view %vb=cor(not(comp(%0,%1,D)),orlflags(%0,WIZARD ROYALTY),haspower(%0,see_all),visible(%0,%1/MONEY),cand(member(llocks(%1),USER:EVIEW),elock(%1/USER:EVIEW,%0)))
+
+@@ can-take - can %0 take money (%2) from %1?
+&econ`fun.can-take %vb=if(member(llocks(%1),USER:ETAKE),ulocal(%ve/econ`fun.can-take-sub,%2,,,,,,,,%0,%1),not(comp(%0,owner(%1),d)))
+&econ`fun.can-take-sub %vb=elock(%9/USER:ETAKE,%8)
+
+@@ can-give - can %0 give money (%2) to %1?
+&econ`fun.can-give %vb=ulocal(econ`fun.can-give-sub,%2,,,,,,,,%0,%1)
+&econ`fun.can-give-sub %vb=elock(%9/USER:EGIVE,%8)
+
+
+@@ can-afford - does the int-list %0 contain enough to pay the int-list %1?
+&econ`fun.can-afford %ve=gte(lmath(min,vsub(ufun(%ve/econ`fun.pad,%0),ufun(%ve/econ`fun.pad,%1),|),|),0)
+
+@@ @@@@@@@@@@
+@@ ECON()
+&econ`fun.econ %vb=switch(0,strlen(%0),#-1 INVALID OPTION,not(strlen(setinter(* ? `,edit(%0,,%b)))),#-1 INVALID OPTION,strlen(setr(0,first(lattr(%vb/econ`fun.econ`%0*)))),#-1 INVALID OPTION,eq(bound(sub(%+,1),get(%vb/%q0`min),get(%vb/%q0`max)),sub(%+,1)),#-1 WRONG NUMBER OF ARGUMENTS,ufun(%vb/%q0,%@,%1,%2,%3,%4,%5,%6,%7,%8,%9))
+
+@@ Each sub-function receives the caller's dbref as %0, and the nine available args as %1-%9
+
+&econ`fun.econ`view %vb=switch(locate(%0,switch(%1,,me,%1),N*),#-1,#-1 NO SUCH OBJECT,#-2,#-2,switch(0,ufun(%vb/econ`fun.can-view,%0,#$),#-1 PERMISSION DENIED,t(%2),ufun(%ve/econ`fun.ints-to-words,default(#$/MONEY,ufun(%ve/econ`fun.pad,0))),default(#$/MONEY,ufun(%ve/econ`fun.pad,0))))
+  &econ`fun.econ`view`min %vb=0
+  &econ`fun.econ`view`max %vb=2
+
+&econ`fun.econ`adjust %vb=switch(0,hasflag(%0,wizard),#-1 PERMISSION DENIED,t(setr(0,locate(%0,%1,N*))),#-1 NO SUCH OBJECT,ufun(%ve/econ`fun.valid-ints,%2),#-1 INVALID ARGUMENT,attrib_set(%q0/MONEY,regeditall(v[if(%3,add,sub)](ufun(%ve/econ`fun.pad,default(%q0/MONEY,0)),ufun(%ve/econ`fun.pad,%2),|),(-\\d+),0))1)
+  &econ`fun.econ`adjust`min %vb=3
+  &econ`fun.econ`adjust`max %vb=3
+
+&econ`fun.econ`valid %vb=switch(,%2,ufun(%ve/econ`fun.valid-words,%1),setr(0,grab(words ints,%2*)),#-1 INVALID TYPE,ufun(%ve/econ`fun.valid-%q0,%1))
+  &econ`fun.econ`valid`min %vb=1
+  &econ`fun.econ`valid`max %vb=2
+
+&econ`fun.econ`convert %vb=switch(,%2,ufun(%vb/econ`fun.econ`convert`sub,%1,words,ints),setr(0,grab(words ints,%2*)),#-1 INVALID TYPE,ufun(%vb/econ`fun.econ`convert`sub,%1,%q0,setdiff(words ints,%q0)))
+ &econ`fun.econ`convert`sub %vb=if(ufun(%ve/econ`fun.valid-%1,%0),ufun(%ve/econ`fun.%1-to-%2,%0),#-1 INVALID LIST)
+  &econ`fun.econ`convert`min %vb=1
+  &econ`fun.econ`convert`max %vb=2
+
+&econ`fun.econ`sub %vb=if(cand(ufun(%ve/econ`fun.valid-ints,%1),ufun(%ve/econ`fun.valid-ints,%2)),vsub(ufun(%ve/econ`fun.pad,%1),ufun(%ve/econ`fun.pad,%2),|),#-1 INVALID ARGUMENT)
+  &econ`fun.econ`sub`min %vb=2
+  &econ`fun.econ`sub`max %vb=2
+
+&econ`fun.econ`add %vb=if(cand(ufun(%ve/econ`fun.valid-ints,%1),ufun(%ve/econ`fun.valid-ints,%2)),vadd(ufun(%ve/econ`fun.pad,%1),ufun(%ve/econ`fun.pad,%2),|),#-1 INVALID ARGUMENT)
+  &econ`fun.econ`add`min %vb=2
+  &econ`fun.econ`add`max %vb=2
+
+&econ`fun.econ`afford %vb=if(cand(ufun(%ve/econ`fun.valid-ints,%1),ufun(%ve/econ`fun.valid-ints,%2)),ufun(%ve/econ`fun.can-afford,%1,%2),#-1 INVALID ARGUMENT)
+  &econ`fun.econ`afford`min %vb=2
+  &econ`fun.econ`afford`max %vb=2
+
+&econ`fun.econ`equal %vb=switch(0,ufun(%ve/econ`fun.valid-ints,%1),#-1 INVALID ARGUMENT,ufun(%ve/econ`fun.valid-ints,%2),#-1 INVALID ARGUMENT,strlen(%3),strmatch(ufun(%ve/econ`fun.pad,%1),ufun(%ve/econ`fun.pad,%2)),isint(%3),#-1 ARG MUST BE INTEGER,strmatch(extract(ufun(econ`fun.pad,%1),1,setr(0,bound(%3,1,words(get(%vi/econ`c),|))),|),extract(ufun(%ve/econ`fun.pad,%2),1,%q0,|)))
+  &econ`fun.econ`equal`min %vb=2
+  &econ`fun.econ`equal`max %vb=3
+
+&econ`fun.econ`pad %vb=if(ufun(%ve/econ`fun.valid-ints,%1),ufun(%ve/econ`fun.pad,%1),#-1 INVALID ARGUMENT)
+  &econ`fun.econ`pad`min %vb=1
+  &econ`fun.econ`pad`max %vb=1
+
+&econ`fun.econ`commodities %vb=switch(%1,,ufun(%vb/econ`fun.econ`commodities`sub-comm,if(%2,plural,single)),-1,ufun(%vb/econ`fun.econ`commodities`sub-all-curr),ufun(%vb/econ`fun.econ`commodities`sub-one-curr,%1,if(%2,plural,single)))
+ &econ`fun.econ`commodities`sub-one-curr %vb=if(member(ucstr(get(%vi/econ`M)),ucstr(%0),|),iter(sort(regeditall(lattr(%vi/econ`m`%0`*),\[^0-9 \],),n),## [get(%vi/econ`M`%0`##`%1)],,|),#-1)
+ &econ`fun.econ`commodities`sub-all-curr %vb=get(%vi/econ`M)
+ &econ`fun.econ`commodities`sub-comm %vb=iter(get(%vi/econ`c),get(%vi/econ`c`%i0`%0),|,|)
+  &econ`fun.econ`commodities`min %vb=0
+  &econ`fun.econ`commodities`max %vb=2
+
+&econ`fun.econ-maxargs %vb=add(1,lmath(max,iter(lattr(%vb/econ`fun.econ`*`max),get(%vb/%i0))))
+@set %vb/econ`fun.econ-maxargs=public visual
+
+@@ @@@@@@@@@@
+@@ +COMMODITIES
+&econ`cmd.commodities %vd=$+commodities*: @nspemit/silent %#=ufun(%ve/tag,econ)[switch(squish(%0),,ufun(%ve/econ`fun.commodities),ufun(%ve/econ`fun.commodities-arg,squish(%0)))]
+
+&econ`fun.commodities %ve=The following commodities are available:%r%b%b[iter(get(%vi/econ`c),get(%vi/econ`c`%i0`plural),|,\,%b)]%r[ufun(%ve/tag,econ)]The following currencies are available:%r%b%b[iter(get(%vi/econ`M),%i0[if(hasattr(%vi,ECON`M`%i0`LONGNAME),%b\([get(%vi/ECON`M`%i0`LONGNAME)]\))],|,\,%b)]%r[ufun(%ve/tag,econ)]For more info on a currency, type +COMMODITIES <currency>
+
+&econ`fun.commodities-arg %ve=if(setr(0,member(ucstr(get(%vi/econ`M)),ucstr(%0),|)),The following denominations are available for [setr(0,elements(get(%vi/econ`M),%q0,|))][if(hasattr(%vi,econ`M`%q0`longname),%b([get(%vi/econ`M`%q0`LONGNAME)]))]:%r[table(squish(%b%b[setr(1,get(%vi/econ`M`%q0`1`plural))]|[iter(setdiff(regeditall(lattr(%vi/econ`M`%q0`*),\[^0-9 \],),1,%b,n,%b),%b%b[get(%vi/econ`M`%q0`%i0`plural)] \(%i0 %q1\),,|)],|),38,78,|)],No such currency. Valid currencies are [itemize(get(%vi/econ`M),|)].)
+
+@@ @@@@@@@@@@
+@@ +GIVE <object>=<commodity list>
+&econ`cmd.give %va=$^\+give(/raw)? (.*?)=(.*)$: @nspemit/silent %#=ufun(%ve/tag,econ)[ufun(%vb/econ`fun.give,%2,%3,t(strlen(%1)))] ; @assert %q9 ; @verb %q0=%#,%q9,,o%q9,ufun(%ve/econ`msg.o%q9,%q1,%q2,%q0),a%q9,%q1,%q2
+@set %va/econ`cmd.give=regexp
+
+@@ %0 = person to give to, %1 = what to give, %2 = is arg 1 ints (1) or words (0)
+&econ`fun.give %vb=switch(setq(9,#-1)0,comp(setr(0,locate(%#,%0,N*)),#-1),I don't see that here.,comp(%q0,#-2),I'm not sure which one you mean.,comp(%q0,%#,d),You can't give to yourself!,nearby(%#,%q0),I don't see that here.,if(%2,ufun(%ve/econ`fun.valid-ints,%1),ufun(%ve/econ`fun.valid-words,%1)),I'm not sure what you're trying to give.,ufun(%ve/econ`fun.can-afford,default(%#/MONEY,0),setr(1,if(%2,ufun(%ve/econ`fun.pad,%1),ufun(%ve/econ`fun.words-to-ints,%1)))),You can't afford that.,lmath(add,%q1,|),You should learn to be more generous.,ufun(%vb/econ`fun.can-give,%#,%q0,%q1[setq(2,ufun(%ve/econ`fun.ints-to-words,%q1))]),setq(9,egivefail)[name(%q0)] refuses your payment.,setq(9,egive)[attrib_set(%#/MONEY,vsub(ufun(%ve/econ`fun.pad,get(%#/MONEY)),%q1,|))][attrib_set(%q0/MONEY,vadd(ufun(%ve/econ`fun.pad,default(%q0/MONEY,0)),%q1,|))]You +give %q2 to [name(%q0)].[nspemit(%q0,ufun(%ve/tag,econ)%n +gives %q2 to you.)])
+
+&econ`msg.oegive %ve=+gives %1 to [name(%2)].
+&econ`msg.oegivefail %ve=tries to +give something to [name(%2)], but [subj(%2)] refuses it.
+
+@@ @@@@@@@@@@
+@@ +DONATE <object>=<commodity list>
+&econ`cmd.donate %va=$+donate *=*: @nspemit/silent %#=ufun(%ve/tag,econ)[ufun(%vb/econ`fun.donate,%0,%1)]
+
+&econ`fun.donate %vb=switch(0,hasflag(%#,wizard),Permission denied.,comp(setr(0,locate(%#,%0,N*)),#-1),I don't see that here.,comp(%q0,#-2),I'm not sure which one you mean.,ufun(%ve/econ`fun.valid-words,%1),I'm not sure what you're trying to give.,setq(1,ufun(%ve/econ`fun.words-to-ints,%1))You donate [setr(2,ufun(%ve/econ`fun.ints-to-words,%q1))] to [name(%q0)]\(%q0\).[nspemit(%q0,[ufun(%ve/tag,econ)]%n donates %q2 to you.)][attrib_set(%q0/MONEY,vadd(ufun(%ve/econ`fun.pad,default(%q0/MONEY,0)),%q1,|))])
+
+@@ @@@@@@@@@@
+@@ +TAKE <object>=<commodity list>
+&econ`cmd.take %va=$^\+take(/raw)? (.*?)=(.*)$: @nspemit/silent %#=ufun(%ve/tag,econ)[ufun(%vb/econ`fun.take,%2,%3,t(strlen(%1)))] ; @assert %q0 ; @verb %q0=%#,%q9,,o%q9,ufun(%ve/econ`msg.o%q9,%q1,%q2,%q0),a%q9,%q1,%q2
+@set %va/econ`cmd.take=regexp
+
+@@ %0 = person to take from, %1 = what to take, %2 = is arg 1 ints (1) or words (0)
+&econ`fun.take %vb=switch(setq(9,#-1)0,comp(setr(0,locate(%#,%0,N*)),#-1),I don't see that here.,comp(%q0,#-2),I'm not sure which one you mean.,comp(%q0,%#,d),You can't take from yourself!,nearby(%#,%q0),I don't see that here.,if(%2,ufun(%ve/econ`fun.valid-ints,%1),ufun(%ve/econ`fun.valid-words,%1)),I'm not sure what you're trying to take.,lmath(add,setr(1,if(%2,ufun(%ve/econ`fun.pad,%1),ufun(%ve/econ`fun.words-to-ints,%1))),|),Nothing? Aim higher\, %n!,ufun(%vb/econ`fun.can-take,%#,%q0,%q1[setq(2,ufun(%ve/econ`fun.ints-to-words,%q1))]),setq(9,etakefail)[name(%q0)] doesn't want to give you that.,ufun(%ve/econ`fun.can-afford,default(%q0/MONEY,0),%q1),name(%q0) doesn't have that much.,setq(9,etake)[attrib_set(%#/MONEY,vadd(ufun(%ve/econ`fun.pad,default(%#/MONEY,0)),%q1,|))][attrib_set(%q0/MONEY,vsub(ufun(%ve/econ`fun.pad,get(%q0/MONEY)),%q1,|))]You +take %q2 from [name(%q0)].)
+
+&econ`msg.oetake %ve=+takes %1 from [name(%2)].
+
+@@ @@@@@@@@@@
+@@ +MONEY [<object>]
+&econ`cmd.money %va=$+money*: @nspemit/silent %#=ufun(%ve/tag,econ)[ufun(%vb/econ`fun.money,%0)]
+
+&econ`fun.money %vb=switch(0,strlen(%0),ufun(%ve/econ`fun.money-sub,You have,%#),t(setr(0,locate(%#,squish(%0),N*))),switch(%q0,#-1,I don't see that here.,I don't know which one you mean.),ufun(%vb/econ`fun.can-view,%#,%q0),Permission denied.,ufun(%vb/econ`fun.money-sub,switch(%q0,%#,You have,name(%q0) has),%q0))
+
+&econ`fun.money-sub %ve=%0 [ufun(%ve/econ`fun.ints-to-words,default(%1/MONEY,0))].
+
+@@ @@@@@@@@@@
+think ansi(h,Setting Startup attributes...)
+
+&econ`attr`money %vs=no_command no_inherit no_clone wizard
+&econ`attr`egive %vs=no_command prefixmatch
+&econ`attr`egivefail %vs=no_command prefixmatch
+&econ`attr`aegive %vs=no_command prefixmatch
+&econ`attr`aegivefail %vs=no_command prefixmatch
+&econ`attr`oegive %vs=no_command prefixmatch
+&econ`attr`oegivefail %vs=no_command prefixmatch
+&econ`attr`etake %vs=no_command prefixmatch
+&econ`attr`etakefail %vs=no_command prefixmatch
+&econ`attr`aetake %vs=no_command prefixmatch
+&econ`attr`aetakefail %vs=no_command prefixmatch
+&econ`attr`oetake %vs=no_command prefixmatch
+&econ`attr`oetakefail %vs=no_command prefixmatch
+
+&econ`cmd`+money %vs=|%va,econ`cmd.money
+&econ`cmd`+commodities %vs=|%vd,econ`cmd.commodities
+&econ`cmd`+give %vs=/eqsplit|%va,econ`cmd.give
+&econ`cmd`+take %vs=/eqsplit|%va,econ`cmd.take
+&econ`cmd`+donate %vs=/eqsplit|%va,econ`cmd.donate
+
+&econ`funp`econ %vs=%vb,econ`fun.econ,1,ufun(%vb/econ`fun.econ-maxargs),localize
+
+@@ @@@@@@@@@@
+think ansi(h,Adding package to the Core...)
+
++TMCS/ADDPACKAGE econ=Economy System/2.2g/A multi-currency, multi-denomination economy and resource system/\[+MONEY\]%b
+
+@@ @@@@@@@@@@
+think ansi(h,Installation Complete.)
+

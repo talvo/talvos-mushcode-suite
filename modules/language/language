@@ -1,0 +1,184 @@
+@@ @@@@@@@@@@
+@@ +Languages Code by Talvo
+@@ A part of Talvo's MUSHcode Suite from www.talvo.com
+
+think ansi(h,Installing Language code...)
+
+@@ @@@@@@@@@@
+@@ Fluencies:
+@@ None - 0
+@@ Basic - 1 to 100
+@@ Elementary - 101 to 200
+@@ Intermediate - 201 to 300
+@@ Conversational - 301 to 400
+@@ Advanced - 401 to 500
+@@ Proficient - 501 to 600
+@@ Nearly Fluent - 601 to 700
+@@ Fluent - 701 to 800
+
+&lang`fluencies %ve=Basic|Elementary|Intermediate|Conversational|Advanced|Proficient|Nearly Fluent|Fluent
+
+@@ @@@@@@@@@@
+@@ Utility Functions
+
+@@ Return %0's relative fluency in language %1
+&lang`fun.fluency %ve=floor(ufun(lang`fun.fluency-real,%0,%1))
+
+@@ Return %0's actual fluency in language %1
+&lang`fun.fluency-real %ve=firstof(elements(ufun(lang`fun.levels,%0),%1,|),0)
+
+@@ Return the English form of %0's fluency in %1
+&lang`fun.fluency-english %ve=ufun(lang`fun.fluency-english-int,ufun(lang`fun.fluency-num,%0,%1))
+
+@@ Return the English form of fluency number %0
+&lang`fun.fluency-english-int %ve=switch(%0,<1,None,>800,last(v(lang`fluencies),|),elements(v(lang`fluencies),ufun(lang`fun.fluency-num-int,%0),|))
+
+@@ Return the number of the level of %0's fluency in lang %1
+&lang`fun.fluency-num %ve=ufun(lang`fun.fluency-num-int,ufun(lang`fun.fluency,%0,%1))
+
+@@ Return the number of the level of fluency number %0
+&lang`fun.fluency-num-int %ve=switch(%0,<1,0,<101,1,<201,2,<301,3,<401,4,<501,5,<601,6,<701,7,8)
+
+&lang`fun.isfluency %ve=switch(matchall(|[v(lang`fluencies)],%0*,|),,0,* *,0,sub(#$,1))
+
+&lang`fun.islang %ve=switch(matchall(|[v(lang`languages)],%0*,|,%b),,#-1,* *,#-2,sub(#$,1))
+&lang`fun.langname %ve=elements(v(lang`languages),%0,|)
+
+&lang`fun.levels %ve=extract(default(%0/lang,0)[repeat(|0,words(v(lang`languages),|))],1,words(v(lang`languages),|),|)
+
+@@ Can player %0 speak lang %1 with a fluency of %2?
+&lang`fun.canspeak %ve=switch(ufun(lang`fun.fluency-num,%0,%1),0,0,<%2,0,1)
+
+@@ @@@@@@@@@@
+@@ +SPEAK <lang>[:<skill>]=<msg>
+&lang`cmd.speak %va=$^\+speak (.+?)(?\:\:(.+?))?=([\:;"|])?(.+)$: @nspemit/silent %#=ufun(%vb/lang`fun.speak,%1,%2,firstof(%3,"),%4)
+@set %va/lang`cmd.speak=regexp
+
+@@ %0 = language, %1 = (optional) skill, %2 = : ; | ", %3 = msg
+@@ Registers: %qL = language num, %qF = fluency of speech (not speaker!), %qN = language name, %qZ = fluency of listener
+@@ %qP = pattern of when to garble and when not to, %qQ = as %qp, but per-listener, %qT = tmp var,
+@@ %qW = garble word (ie, <unintelligible %qW>), %qY = listener
+&lang`fun.speak %vb=setq(t,\[+SPEAK\]%b)[switch(0,t(setr(L,ufun(%ve/lang`fun.islang,%0))),%qtNo such language.,if(strlen(%1),cand(setr(f,ufun(%ve/lang`fun.isfluency,%1)),ufun(%ve/lang`fun.canspeak,%:,%qL,%qF),setr(f,rand(setr(f,add(1,mul(sub(%qF,1),100))),min(ufun(%ve/lang`fun.fluency,%:,%qL),add(%qF,99))))),switch(setr(f,ufun(%ve/lang`fun.fluency-num,%:,%qL)),0,0,>799,,%qf,setr(f,rand(add(1,mul(sub(%qF,1),100)),ufun(%ve/lang`fun.fluency,%:,%qL))))),%qtYou don't speak [ufun(%ve/lang`fun.langname,%qL)] that fluently.,setq(0,0,N,ufun(%ve/lang`fun.langname,%qL))[speak(%#,%2%3,,%ve/lang`fun.speak-self)][null(ufun(lang`fun.learn,%:,%qL,u(%ve/lang`learn`speech,%qF,ufun(%ve/lang`fun.fluency,%#,%qL)))[setq(W,SPEECH,P,ulocal(%ve/lang`fun.garble-pattern,div(%qF,8),repeat(1%b,50)))][iter(setdiff(lcon(%L),%#),nspemit(setq(q,ufun(%ve/lang`fun.garble-pattern,div(setr(z,ufun(%ve/lang`fun.fluency,##,%qL)),8),%qp))[setr(y,##)][ufun(lang`fun.learn,##,%qL,ufun(%ve/lang`learn`hear,ufun(%ve/lang`fun.fluency,##,%qL),%qF))],speak(%#,%2%3,,%ve/lang`fun.garble)))])])]
+
+@@ Add %2 onto %0's fluency in %1
+&lang`fun.learn %vb=ufun(lang`fun.setfluency,%0,%1,add(ufun(%ve/lang`fun.fluency-real,%0,%1),%2))
+
+@@ Set %0's fluency in %1 to %2
+&lang`fun.setfluency %vb=attrib_set(%0/LANG,replace(ufun(%ve/lang`fun.levels,%0),%1,bound(%2,0,1000),|))
+
+&lang`fun.garble %ve=if(hasflag(%qY,LINGUIST),"<%qN> %0",switch(min(%qz,%qf),<45,"<UNINTELLIGIBLE %qW>",<85,"<%qW IN %qN>","<%qN> [ufun(lang`fun.garble-sub,%0)]"))
+&lang`fun.speak-self %ve="<[ufun(lang`fun.fluency-english-int,%qf)] %qN> %0"
+
+@@ %0 is a string of text. %1 is the fluency of the speaker, %2 the fluency of the listener. Garble it as apprioriate.
+&lang`fun.garble-sub %ve=iter(%0,if(elements(%qq,mod(#@,200)),%i0,...))[setq(t,mod(words(%0),200))][setq(q,extract(%qq,%qt,200) [extract(%qq,1,%qt)])]
+
+&lang`fun.garble-pattern %ve=setr(0,iter(%1,switch(rand(1,100),<%0,%i0,0))) [shuffle(%q0)] [shuffle(%q0)] [shuffle(%q0)]
+
+@@ @@@@@@@@@@
+@@ LANG(<text>,<language>,<fluency>,<reader>[,<display-word>])
+@@ Shares registers with cmd.speak/code.speak, as they're used by fun.garble
+&lang`fun.lang-function %ve=localize(switch(0,t(setr(L,ufun(%ve/lang`fun.islang,%1))),speak(%@,|%0),t(eq(setr(F,bound(%2,1,1000)),%2)),speak(%@,|%0),t(setr(Y,locate(%@,%3,*))),speak(%@,|%0),setq(W,switch(%+,5,%4,SPEECH),N,ufun(lang`fun.langname,%qL),Q,ulocal(lang`fun.garble-pattern,setr(Z,ufun(lang`fun.fluency,%qY,%qL)),setr(P,ulocal(lang`fun.garble-pattern,div(%qF,8),repeat(1%b,50)))))[speak(%@,|%0,,lang`fun.garble)]))
+
+@@ @@@@@@@@@@
+@@ +LANGUAGES [<player>]
+@@ +LANGUAGES/ALL
+&lang`cmd.languages %vd=$^\+lang(?\:uage)?s?(/all|(?\: (.+)))?$: @nspemit/silent %#=\[+LANGUAGES\] [switch(0,strlen(squish(get(%ve/lang`languages))),There are no languages in the system.,not(strmatch(%1,/all)),The following languages can be spoken:%r[itemize(sort(get(%ve/lang`languages),i,|),|)],strlen(%2),ufun(%ve/lang`fun.languages,%:,0),t(setr(0,locate(%#,%2,PFapym))),No such player.,orflags(%#,Wr),Permission denied.,ufun(%ve/lang`fun.languages,%q0,1))]
+@set %vd/lang`cmd.languages=regexp
+
+&lang`fun.languages %ve=if(%1,name(%0) speaks,You speak) [switch(0,lmath(add,setr(0,ufun(lang`fun.levels,%0)),|),no languages.,the following languages:%r[squish(iter(%q0,switch(##,0,,%b%b[ljust(ufun(lang`fun.langname,#@),25)][ufun(lang`fun.fluency-english-int,##)][if(%1,%b(##))]),|,%r),%r)]%r)]
+
+@@ @@@@@@@@@@
+@@ +MAKETEACHER <player>
+&lang`cmd.maketeacher %va=$+maketeacher *: @nspemit/silent %#=\[+MAKETEACHER\] [ufun(%vb/lang`fun.maketeacher,%0)]
+
+&lang`fun.maketeacher %vb=switch(0,orflags(%:,Wr),Permission denied.,t(setr(0,locate(%#,%0,PFapym))),No such player.,hasflag(%q0,TEACHER),You grant [name(%q0)] teaching privileges.[attrib_set(%ve/lang`teachers,setunion(get(%ve/lang`teachers),objid(%q0)))][set(%q0,TEACHER)][nspemit(%q0,\[+MAKETEACHER\] %n has granted you teaching privileges.)],You revoke [name(%q0)]'s teaching privileges.[attrib_set(%ve/lang`teachers,setdiff(get(%ve/lang`teachers),objid(%q0)))][set(%q0,!TEACHER)][nspemit(%q0,\[+MAKETEACHER\] %n has revoked your teaching privileges.)])
+
+@@ @@@@@@@@@@
+@@ +TEACHERS
+&lang`cmd.teachers %vd=$+teachers: @nspemit/silent %#=ufun(%ve/lang`fun.teachers)
+
+&lang`fun.teachers %ve=\[+TEACHERS\] List of teachers:%r[ufun(lang`fun.remove-dead-teachers)][setq(0,%#)][table(iter(filter(lang`fun.can-teach-player,v(lang`teachers)),name(##),,|),18,78,|,)]
+
+@@ This should return 1 if %0 is allowed to teach %q0. Meant for, ie, only allowing people to teach others of the same
+@@ species - strmatch(get(%0/race),get(%q0/race)) etc
+&lang`fun.can-teach-player %ve=1
+
+&lang`fun.remove-dead-teachers %ve=null(attrib_set(%ve/lang`teachers,filterbool(#lambda/num(%%0),get(%ve/lang`teachers))))
+
+@@ @@@@@@@@@@
+@@ +TEACH <player>=<language>
+&lang`cmd.teach %va=$+teach *=*: @nspemit/silent %#=\[+TEACH\] [ufun(%vb/lang`fun.teach,%0,%1)]
+
+&lang`fun.teach %vb=switch(0,hasflag(%#,TEACHER),You aren't a teacher.,t(setr(0,locate(%#,%0,PFapym))),No such player.,ufun(%ve/lang`fun.can-teach-player,%#),You can't teach [name(%q0)].,t(setr(1,ufun(%ve/lang`fun.islang,%1))),No such language.,ufun(%ve/lang`fun.can-teach-player-2,%#,%q0),You can't teach [name(%q0)] at the moment.,gte(sub(secs(),get(%ve/lang`teach-time)),default(%q0/lang`lasttaught,convtime(ctime(%q0)))),name(%q0) needs to rest a while before learning anything new.,comp(%#,%q0),You can't teach yourself.,lt(setr(2,ufun(%ve/lang`fun.fluency,%q0,%q1)),setr(3,ufun(%ve/lang`fun.fluency,%#,%q1))),There's not much you can teach [name(%q0)].,gte(%q3,401),You need to learn a bit more [ufun(%ve/lang`fun.langname,%q1)] before you can teach it to others.,You teach [name(%q0)] some [ufun(%ve/lang`fun.langname,%q1)].[nspemit(%q0,\[+TEACH\] %n teaches you some [ufun(%ve/lang`fun.langname,%q1)].)][attrib_set(%q0/lang`lasttaught,secs())][ufun(%vb/lang`fun.learn,%q0,%q1,ufun(%ve/lang`learn`teach,%q2,%q3))])
+
+@@ This is meant for "on-the-spot" checks - are both players IC, in the same room, etc. %0 = teacher, %1 = student
+&lang`fun.can-teach-player-2 %ve=nearby(%0,%1)
+
+@@ Amount of time you must wait between two +teaches, in seconds.
+&lang`teach-time %ve=604800
+
+@@ @@@@@@@@@@
+@@ +SETFLUENCY <player>=<language>/<fluency>
+&lang`cmd.setfluency %va=$+setfluency *=*/*: @nspemit/silent %#=\[+SETFLUENCY\] [ufun(%vb/lang`fun.setfluency-cmd,%0,%1,%2)]
+
+&lang`fun.setfluency-cmd %vb=switch(0,orflags(%#,Wr),Permission denied.,t(setr(0,locate(%#,%0,PFapym))),No such player.,t(setr(1,ufun(%ve/lang`fun.islang,%1))),No such language.,strmatch(bound(%2,0,1000),%2),That's not a valid fluency level. Must be between 0 and 1000.,setq(2,ufun(%ve/lang`fun.fluency,%q0,%q1))[ufun(%vb/lang`fun.setfluency,%q0,%q1,%2)]You set [name(%q0)]'s fluency in [setr(3,ufun(%ve/lang`fun.langname,%q1))] from %q2 ([setr(4,ufun(%ve/lang`fun.fluency-english-int,%q2))]) to %2 ([setr(5,ufun(%ve/lang`fun.fluency-english-int,%2))]).[nspemit(%q0,\[+SETFLUENCY\] %n adjusts your fluency in %q3 from %q4 to %q5.)])
+
+@@ @@@@@@@@@@
+@@ +ADDLANG <lang>
+&lang`cmd.addlang %vd=$+addlang *: @nspemit/silent %#=\[+LANGUAGE\] [ufun(%ve/lang`fun.addlang,%0)]
+
+&lang`fun.addlang %ve=switch(0,hasflag(%#,wizard),Permission denied.,not(member(ucstr(get(%ve/lang`languages)),ucstr(setr(0,squish(stripansi(%0)))),|)),That language already exists.,regmatch(%q0,^\[a-zA-Z_-\]\{3\,25\}$),That is not a valid name for a language.,attrib_set(%ve/lang`languages,squish(get(%ve/lang`languages)|%q0,|))Language added. You will need to use +SETFLUENCY to give some people fluency in the language before it can be used.)
+
+@@ @@@@@@@@@@
+@@ +DELLANG <lang>
+&lang`cmd.dellang %va=$+dellang *: @nspemit/silent %#=\[+LANGUAGE\] [ufun(%vb/lang`fun.dellang,%0)]
+
+&lang`fun.dellang %vb=switch(0,hasflag(%#,wizard),Permission denied,setr(0,member(ucstr(get(%ve/lang`languages)),ucstr(squish(stripansi(%0))),|)),That language does not exist.,ufun(lang`fun.dellang-players,%q0)[attrib_set(%ve/lang`languages,squish(ldelete(get(%ve/lang`languages),%q0,|),|))]Language deleted.)
+
+@@ Would use lang:*|*|* in the lsearch(elock,..) but | is the lock-type delim as well as the lang attr delim. Meh.
+&lang`fun.dellang-players %vb=null(iter(lsearch(all,type,player,elock,lang:[iter(lnum(1,%0),?,,?)]*),attrib_set(##/LANG,ldelete(get(##/LANG),%0,|))))
+
+@@ @@@@@@@@@@
+@@ How much does your language ability increase when you speak the language? %0 is the fluency spoken at, %1 is the current
+@@ fluency of the speaker (different if +speak lang:fluency=msg used). Doesn't have to be a whole number
+&lang`learn`speech %ve=0.75
+
+@@ How much does your language ability increase when you hear someone speak the language? %0 is your fluency,
+@@ %1 is the fluency the language is spoken at.
+&lang`learn`hear %ve=0.75
+
+@@ How much does your language ability increase when you're taught? %0 is current fluency, %1 is teacher's fluency.
+@@ Doesn't have to be a whole number.
+&lang`learn`teach %ve=lmath(min,switch(sub(%1,%0),<25,1.5,<50,3.5,<100,6,<150,7,150) [switch(%1,<300,5,<400,10,<500,13.5,add(15,mul(0.5,div(sub(%1,525),10))))] [lmath(sub,%1 %0 0.5)])
+
+@@ Default LEARN`TEACH: First, check the difference in fluencies between teacher and student. If it's <25, use 1.5
+@@ < 50, use by 3.5, <100 by 6, <150 by 8. Else, use 150.
+@@ Then check the teacher's fluency. If < 300, use 5. If <400, use 10. <500, use 13.5. Else, use 15 + 0.5 for every 10
+@@ points the teacher is over 525.
+@@ Use teacher fluencny - student fluency - 0.5
+@@ Take the lowest of these three numbers, and increase the student's fluency by that amount.
+@@ The thinking behind this is that a) a student will never become better in a language than the person teaching him
+@@ (rule 3). Someone who is barely more skilled in a language than the person they're teaching won't be able to teach
+@@ the student much (rule 1). And someone who is poor at a language can't teach a person much, while someone very skilled
+@@ at a language can teach more (rule 2).
+
+think ansi(h,Adding Startup attributes...)
+&lang`attr`lang %vs=no_command no_clone no_inherit mortal_dark wizard
+&lang`funp`lang %vs=%ve,lang`fun.lang-function,4,5
+&lang`cmd`+speak %vs=/eqsplit|%va,lang`cmd.speak
+&lang`cmd`+teach %vs=|%va,lang`cmd.teach
+&lang`cmd`+teachers %vs=|%vd,lang`cmd.teachers
+&lang`cmd`+maketeacher %vs=|%va,lang`cmd.maketeacher
+&lang`cmd`+languages %vs=|%vd,lang`cmd.languages
+&lang`cmd`+setfluency %vs=|%va,lang`cmd.setfluency
+&lang`cmd`+addlang %vs=|%vd,lang`cmd.addlang
+
+@@ @@@@@@@@@@
+think ansi(h,Adding package to the Core...)
+
++TMCS/ADDPACKAGE lang=+Language/1.3/System to allow players to learn and speak many languages/
+
+@@ @@@@@@@@@@
+think ansi(h,Upload complete. Please have #1 [ansi(gh,@flag/add LINGUIST=,any,wizard,wizard)] and [ansi(gh,@flag/add TEACHER=,player,wizard,wizard)] to complete the installation. You will then need to +ADDLANG <language> to add languages.)
+
+

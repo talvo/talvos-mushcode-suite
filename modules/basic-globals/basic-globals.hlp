@@ -1,0 +1,260 @@
+
+& 78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+& TMCS GLOBALS
+
+  The Globals package of Talvo's MUSHCode Suite adds the following commands
+  (use 'help <command>' for more information):
+
+  +3WHO           COUNT           +DISPLAY        +FINGER        
+  +NEWBIES        +OS             +POLL           +SELFBOOT      
+  +STAFF          +WHERE          +WHO   
+
+  Some of these commands can be customised by staff; see the helpfiles for
+  more details.
+
+& +WHO
+
+  +WHO [<name>]
+  +WHO/ACTIVE [<time>]
+  +WHO/HERE
+  +WHO/<attr> <value>
+
+  The +who command lists all players online, and shows some important
+  information about them. If specified, only players whose names begin with
+  <name> will be listed.
+
+  +WHO/ACTIVE only shows players who have been idle for less than <time>, if
+  given, or 5 minutes if not. <time> can be a number in seconds, or a
+  combination of numbers followed by 's' for seconds, 'm' for minutes and
+  'h' for hours (such as '5m 30s').
+
+  +WHO/HERE lists only players in the same room as you.
+
+  +WHO/<attr> <value> lists only players whose <attr> attribute contains
+  a word starting with <value>. The valid values for <attr> can be seen
+  with +TMCS/WHO ATTRS.
+
+  Admins can customize +Who, as shown in HELP +WHO2.
+  See also: +where, +qwho
+
+& +WHO2
+
+  +TMCS/WHO <option>[=<value>]
+
+  This command can be used to customize the +who command. There are
+  three valid <option>s: attrs, fields, and fields-top
+  If =<value> is omitted, the current value is shown.
+
+  Note that the <value> is evaluated both when you use the +TMCS/WHO
+  command, and when the value is called later, so you may wish to use
+  the ']' command prefix to prevent evaluation of any code in <value>
+  when you enter it.
+
+  For "attrs", <value> should be a space-separated list of attribute
+  names. These are the attributes which can be given as switches to
+  +who to limit the output. For example, +tmcs/who attrs=race status surname
+
+  Continued in HELP +WHO3
+
+& +WHO3
+
+  The labels shown at the top of +who can be changed using the "fields-top"
+  option. In this case, <value> should be a space-separated list of
+  <string>:<size> pairs, where each <string> will be left-justfied <size>
+  characters (with an additional space afterwards). For example:
+  +TMCS/WHO FIELDS-TOP=Name:[config(player_name_len)] Idle:4 Sta:3
+                        Race:10 Location:30
+
+  You can customize the information shown for each player with the "fields"
+  option. <value> is a space-separated list of <field>:<size> pairs, where
+  <field> is one of:
+  "name" (player's name), "accname" (player's accented name), "conn" or
+  "idle" for connection or idle time, "loc" or "room" for the name of the
+  player's location or outermost location, "attr:<attr>" or "uattr:<attr>".
+  The latter two can be used to show the text stored in an attribute on the
+  player; "attr" does not evaluate it, and "uattr" does.
+  Example:
+  +TMCS/WHO FIELDS=name:[config(player_name_len)] idle:-4 attr:status:3
+                   attr:race:10 loc:30
+
+  The text will be trimmed/justified to be <size> characters in length.
+  If <size> is negative, the text is right-justified instead of left. As
+  with the labels, a space is added between fields.
+
+& 78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+& +QWHO
+& +3WHO
+
+  +QWHO[/<switch>]
+
+  This command lists all players online in a compact column format, along
+  with their idle times. Players idle less than five minutes are hilighted.
+  The command can take three <switch>es which change the order of the players;
+  /name (the default), /conn, or /idle.
+
+  See also: +who, +where
+
+& +WHERE
+
+  +WHERE[/loc|/room]
+
+  This command shows all online players, grouped by location. By default, the
+  player's outmost container is used (so if they're inside a wagon object,
+  it shows the room the wagon is in), but you can use the /loc switch to
+  show their actual location.
+
+  See also: +who, +qwho, UNFINDABLE
+
+& +OS
+& +OOC
+& OS
+& OOC
+& '
+
+  +OS <message>
+  '<message>
+
+  These commands let you speak OOCly. If <message> is prefixed by a : or ;
+  your message will be posed or semiposed, respectively. Otherwise it will
+  be spoken. OOC messages have an '<OOC>' prefix.
+
+  OS, OOC and +OOC are aliases for +OS.
+
+& +DISPLAY
+
+  +DISPLAY <object>[/<attribute>]
+
+  If no <attribute> is given, this command displays a lists of visible
+  attributes on <object>. Otherwise, it evaluates the attribute and shows
+  you it.
+
+& +NEWBIES
+& +OLDBIES
+
+  +NEWBIES
+  +OLDBIES
+
+  These commands list the 15 connect players who have been on the game the 
+  shortest and longest amounts of time, respectively.
+
+& COUNT
+
+  COUNT <object>
+
+  This command checks all the attributes on <object> which you can see for
+  mismatches uses the brackets() function, and tells you which attributes
+  have mismatches and how many of each kind of opening and closet bracket
+  were found. Mismatches are often (though not always) signs of typos and
+  mistakes in softcode.
+
+  See also: brackets()
+
+& +STAFF
+& +ADMINS
+
+  +STAFF
+
+  This command lists all admins on the game, sorted by name. It also shows
+  how long they've been idle, for admins who are online. The total number of
+  online admins is shown at the bottom.
+
+  The information shown on +staff can be customized. See HELP +STAFF2.
+
+& +STAFF2
+
+  +TMCS/STAFF <field>[=<value>]
+
+  This command can be used to change who is listed by the +staff command
+  (when <field> is "list"), or the comments shown beside people's names
+  ("comments"). If =<value> is omitted, the current value is shown.
+
+  For "list", <value> should evaluate to a list of dbrefs or objids of
+  all staff members. For example:
+  ]+TMCS/STAFF LIST=get(#0/STAFF-LIST)   or
+  +TMCS/STAFF LIST=lsearch(all,eplayer,orflags\(##\,Wr\))
+
+  For "comments", <value> should evaluate to a staff member's comments,
+  with %0 being the dbref of the staffer. For example:
+  ]+TMCS/STAFF COMMENTS=get(%0/STAFF-DUTIES)
+
+& +FINGER
+
+  +FINGER <player>
+
+  This command shows important information about a player, including their
+  name, location, and whether they're online.
+
+  Staff can configure the information shown on +finger; see HELP +FINGER2.
+
+& +FINGER2
+
+  +TMCS/FINGER <option>[=<value>]
+
+  Wizards can use this command to customize the information shown on +finger.
+  There are three possible values for <option>: "short", "long" and 
+  "paragraph". Short fields are displayed in a table, two per row. Long
+  fields are shown in a list, one per line, underneath. Paragraph fields are 
+  shown last, with no limit to their size. If =<value> is omitted, the
+  current values are shown instead.
+
+  For each, <value> should be a |-separated list of fields.
+
+  Valid fields are: name (player's name), accname (player's accented name),
+  idle * (player's idle time), conn * (time player has been online),
+  connidle * (connection and idle time in one field), last ** (last time
+  player connected), loc (name of player's location, or Unfindable),
+  attr:<attr>, uattr:<attr>, attrv:<attr> and uattrv:<attr>.
+
+  * These fields are omitted when the player is not online.
+  ** These fields are omitted when the player is online.
+
+  Continued in HELP +FINGER3
+
+& +FINGER3
+
+  The "attr", "uattr", "attrv" and "uattrv" fields can be used to display
+  the contents of an attribute set on a player. "attr" and "attrv" do not
+  evaluate the attribute (like get()), and "uattr" and "uattrv" do
+  (like ufun()). "attr" and "uattr" will display "None" if the attribute is
+  not set or cannot be read. "attrv" and "uattrv" will omit the field
+  entirely if the attribute is not set.
+
+  All fields can take an optional :<label> suffix. If given, <label> is
+  shown before the field on +finger. Otherwise, a default label is used.
+
+  Example:
+  +TMCS/FINGER SHORT=name|loc|connidle|last|uattr:lastoff:Last Off|
+                     attr:status
+
+  +TMCS/FINGER LONG=attrv:web:Website|attrv:email
+  
+  +TMCS/FINGER PARAGRAPH=attrv:notes|uattrv:bio
+
+& +SELFBOOT
+
+  +SELFBOOT
+
+  This command is an alias for @BOOT/ME. See HELP @BOOT for more info.
+
+& +POLL
+
+  +POLL [<message>]
+  +POLL/BACK [<number>]
+  +POLL/DELETE <id>
+  +POLL/BAN <player>
+
+  With no argument, the +POLL command shows the current poll message. If a
+  <message> is given, the poll will be changed. You cannot set two polls in
+  a row, and it must be at least fifteen minutes since the last poll was set.
+
+  The +POLL/BACK command shows you the last <number> polls (defaults to 10),
+  up to 25. For admins, an id number for each poll is also shown. This can
+  be used with +POLL/DELETE to remove undesirable polls.
+
+  +POLL/BAN can be used by staff to toggle a player's ban status. It can be
+  used to stop people who abuse the command from changing the poll (and to
+  unban reformed abusers).

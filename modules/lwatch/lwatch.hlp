@@ -1,0 +1,52 @@
+& 78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+& TMCS LWATCH
+& +LWATCH
+
+  +LWATCH
+  +LWATCH/ADD <player>
+  +LWATCH/REMOVE <player>
+
+  The LWatch system allows you to see when people connect or disconnect from
+  the game.
+
+  With no arguments or switches, +lwatch lists the names of all people you
+  are currently watching, and all those who are currently watching you.
+  (Players who are watching you but aren't allowed to see your [dis]connect
+  are shown in red.)
+
+  +lwatch/add adds <player> to the list of players whose [dis]connections
+  you are currently monitoring. Please note that even though you can add
+  anyone, you must pass their LWATCH @lock to be able to see them connect or
+  disconnect. Whether or not you pass the lock is not shown.
+
+  +lwatch/remove removes <player> from the list of people you're watching.
+
+  For some examples of how to set the LWATCH @lock and prevent people from
+  seeing you connect or disconnect, see HELP +LWATCH2
+
+& +LWATCH2
+
+  You can set an LWATCH @lock to filter who can see you connect or disconnect
+  with @lock/user:lwatch me=<key>. The syntax for <key> is described in
+  HELP @LOCK, but some examples are given below:
+
+  Don't let anyone see your connects:
+  @lock/user:lwatch me=#false
+
+  Only let people with a RACE attribute set to HUMAN see your connects:
+  @lock/user:lwatch me=race:human
+
+  Only let staff see your connections:
+  @lock/user:lwatch me=flag^wizard|flag^player
+
+  Only let Tom, Dick or Harry see you connect:
+  @lock/user:lwatch me==*tom|=*dick|=*harry
+
+  Don't let Fred or Bill see you connect:
+  @lock/user:lwatch me=!=*fred&!=*bill
+
+  (Note that staff set MONITOR, people in the same room as you, people on
+  !quiet channels with you, etc, will still see you connect. This lock only
+  affects who is notified of your connects by the LWatch system.)
