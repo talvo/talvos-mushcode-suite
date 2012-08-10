@@ -1,0 +1,16 @@
+Installing Talvo's MUSHcode Suite is very simple.
+
+First, you need to make a new wizard character. This character will own everything in the Suite. ALWAYS use this character to make changes to the Suite. NEVER use this character for anything else.
+
+  # Login as God (#1), and run the following commands:
+    # @pcreate !CoreWiz=coolpassword
+    # @set `*`!CoreWiz=WIZARD
+    # @power `*`!CoreWiz=NO_PAY
+  # Logout of God and connect to your newly-made !CoreWiz. DO NOT INSTALL THE CODE AS GOD.
+    # Download the [http://talvos-mushcode-suite.googlecode.com/svn/trunk/suite-core Core] and install by copying and pasting into your MUSH. This is the code which powers the Suite. 
+    # Download and install (by copy/pasting to your MUSH) any of the [Modules] you want to use. They're all optional - you can pick the ones you want and skip the rest.
+      * Note that some modules may tell you to run an additional command as God to complete the installation.
+  # @shutdown/reboot
+  # That's it - the core is now installed and should be working. Check the helpfiles for the modules you've installed to see how to customize them for your game.
+
+This code is fully supported - if you have any problems, please email me. If you find a bug, or would like to suggest a new feature, please open an Issue Ticket here on the Google Code site.
