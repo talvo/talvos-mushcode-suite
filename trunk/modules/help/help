@@ -1,0 +1,125 @@
+@@ @@@@@@@@@@
+@@ +Help Code by Talvo
+@@ A part of Talvo's MUSHcode Suite from www.talvo.com
+
+@@ @@@@@@@@@@
+think ansi(h,Creating Help DB...)
+@set %vi=HELP`DB:[create(TMCS +Help DB)]
+
+&help`cmds [get(%vi/help`db)]=0
+
+@@ This controls who can add, edit and delete individual topics.
+@lock/user:help_edit [get(%vi/help`db)]=flag^wizard|flag^royalty
+
+@@ This controls who can delete entire help commands
+@lock/user:help_delete [get(%vi/help`db)]=flag^wizard
+
+think ansi(h,Adding Help commands...)
+
+@@ +helpcmd/add <cmd>=<lock>
+@@ +helpcmd/lock <cmdId>=<lock>
+@@ +helpcmd/delete <cmdId>
+@@ +helpcmd/list
+@@ +helpcmd/index <cmdId>=<txt>
+@@ +helpcmd/topic <cmdId>=<topic>,<txt>
+@@ +helpcmd/footer <cmdId>=<topic>,<txt>
+
+
+@@ +helpcmd/add <cmd>=<lock>
+&help`cmd.helpcmd-add %vd=$+helpcmd/add *=*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,strlen(setr(0,squish(%0))),Invalid command.,ufun(%ve/help`fun.is-valid-lock,%1),Invalid lock.,Help command '%0' added as command number '[ufun(%ve/help`fun.helpcmd-add,%q0,%qL)]')]
+
+&help`fun.set-temp-lock %ve=localize(null(lock(me/user:help_tmp_lock,%0))[lock(me/user:help_tmp_lock)][null(lock(me/user:help_tmp_lock,))])
+
+&help`fun.sanitize-lock %ve=iter(switch(%0,,#true,%0),iter(%i0,switch(switch(squish(%i0),!*,delete(squish(%i0),0,1),squish(%i0)),=*,%i0,+*,%i0,\\**,%i0,$*,%i0,@*,@@(Not allowed),*/*,@@(Not allowed),*:*,%i0,*^*,%i0,#*,%i0,@@(Not allowed/invalid)),&,&),|,|)
+
+@@ Sets %qL to the sanitized version of the lock as a side-effect
+&help`fun.is-valid-lock %ve=t(comp(*UNLOCKED*,ufun(%ve/help`fun.set-temp-lock,setr(L,ufun(%ve/help`fun.sanitize-lock,%0)))))
+
+&help`fun.helpcmd-add %ve=null(setq(0,default(setr(i,get(%vi/help`db))/help`cmds,0))[attrib_set(%qi/help`cmds,add(1,default(%qi/help`cmds,0)))][iter(lattr(%ve/help`mockup`*),attrib_set(%vd/help`[last(%i0,`)]_%q0,edit(get(%ve/%i0),<cmd>,%0,<num>,%q0)))][attrib_set(%qi/help`cmds`%q0,%0)][ufun(%ve/help`fun.lock-cmd,%0,%1)]   )%q0
+
+&help`fun.lock-cmd %ve=null(lock(get(%vi/help`db)/user:help_cmd_%0,%1))
+
+@@ +helpcmd/footer <cmdId>=<topic>,<text>
+&help`cmd.helpcmd-footer %vd=$+helpcmd/footer *=*,*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied,ufun(%ve/help`is-cmd-id,%0),No such help command.,ufun(%ve/help`hastopic,%0,%1),No such topic.,strlen(%2),Footer cleared.[attrib_set(get(%vi/help`db)/%0`footer`%1)],Footer set.[attrib_set(get(%vi/help`db)/%0`footer`%1,%2)])]
+
+@@ +helpcmd/topic <cmdId>=<topicName>,<text>
+&help`cmd.helpcmd-topic %vd=$+helpcmd/topic *=*,*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`is-cmd-id,%0),No such help command.,regmatch(%1,^\[a-zA-Z0-9_ +=-\]\{1\,30\}),Invalid topic name.,strlen(%2),if(ufun(%ve/help`fun.hastopic,%0,%1),Topic deleted.[wipe(get(%vi/help`db)/%0`*`%1)],No such topic to delete.),Topic added.[attrib_set(get(%vi/help`db)/%0`topic`[edit(%1,%b,_)],%2)])]
+
+@@ +helpcmd/index <cmdId>=<text>
+&help`helpcmd-index %vd=$+helpcmd/index *=*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`is-cmd-id,%0),No such help command.,strlen(%1),Index cleared.[attrib_set(get(%vi/help`db)/%0`index)],Index set.[attrib_set(get(%vi/help`db)/%0`index,%1)])]
+
+@@ +helpcmd/list
+&help`cmd.helpcmd-list %vd=$+helpcmd/list: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,nattr(setr(i,get(%vi/help`db))/help`cmds`*),There are no help commands.,Available help commands:%r[rjust(ID,6)] [ljust(Command,20)] [ljust(Lock,50)]%r[repeat(-,6)] [repeat(-,20)] [repeat(-,50)]%r[iter(lattr(%qi/help`cmds`*),rjust(last(%i0,`),6) [ljust(get(%qi/%i0),20)] [lock(%qi/help_cmd_[last(%i0,`)])],,%r)]%r)]
+
+@@ +helpcmd/lock <cmdID>=<lock>
+&help`cmd.helpcmd-lock %vd=$+helpcmd/lock *=*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`is-cmd-id,%0),No such help command. Use +HELPCMD/LIST for a list.,ufun(%ve/help`fun.is-valid-lock,%1),Invalid lock.,Command re-locked.[ufun(%ve/help`fun.lock-cmd,%0,%qL)])]
+
+@@ +helpcmd/delete <cmdId>
+&help`cmd.helpcmd-delete %vd=$+helpcmd/delete *: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_delete,%#),Permission denied.,ufun(%ve/help`is-cmd-id,%0),No such help command.,Help command deleted.[ufun(%ve/help`fun.delete-help-cmd,%0)])]
+
+&help`fun.delete-help-cmd %ve=null(wipe(%vd/help`*_%0)[wipe(setr(i,get(%vi/help`db))/%0)][wipe(%qi/help`cmds`%0)][lock(%vi/user:help_cmd_%0,)])
+
+&help`is-cmd-id %ve=hasattr(get(%vi/help`db),help`cmds`%0)
+
+&help`mockup`cmd-notopic %ve=$<cmd>: @nspemit/silent %#=ufun(%ve/help`fun.help-notopic,<num>)
+&help`mockup`cmd-topic %ve=$<cmd> *: @nspemit/silent %#=ufun(%ve/help`fun.help-topic,<num>,%0)
+&help`mockup`cmd-list-noarg %ve=$<cmd>/list: @nspemit/silent %#=ufun(%ve/help`fun.help-list,<num>,*)
+&help`mockup`cmd-list-arg %ve=$<cmd>/list *: @nspemit/silent %#=ufun(%ve/help`fun.help-list,<num>,%0)
+&help`mockup`cmd-search %ve=$<cmd>/search *: @nspemit/silent %#=ufun(%ve/help`fun.help-search,<num>,%0)
+
+&help`fun.list-topics %ve=iter(lattr(get(%vi/help`db)/%0`topic`%1),edit(last(%i0,`),_,%b),%b,|)
+&help`fun.count-topics %ve=nattr(get(%vi/help`db)/%0`topic`%1)
+
+&help`fun.cmdname %ve=get(get(%vi/help`db)/help`cmds`%0)
+
+&help`fun.hastopic %ve=hasattr(get(%vi/help`db),%0`topic`%1)
+&help`fun.matchtopic %ve=switch(1,hasattr(setr(i,get(%vi/help`db)),%0`topic`%1),ucstr(%1),nattr(%qi/%0`topic`%1*),last(lattr(%qi/%0`topic`%1*),`),)
+&help`fun.searchtopics %ve=iter(wildgrepi(get(%vi/help`db),%0`topic`*,*%1*),edit(last(%i0,`),_,%b),,|)
+
+&help`fun.hasindex %ve=hasattr(get(%vi/help`db),%0`index)
+
+&help`fun.canuse %ve=elock(get(%vi/help`db)/help_cmd_%0,%1)
+
+&help`header %ve=center(%b[ansi(h,ucstr(ufun(%ve/help`fun.cmdname,%0) %1))]%b,firstof(width(%#,78),78),ansi(gh,=))%r
+&help`footer %ve=%r[ansi(gh,repeat(=,max(5,sub(firstof(width(%#,78),78),add(2,5,strlen(setr(0,switch(%2,,ucstr(ufun(%ve/help`fun.cmdname,%0) %1),%2))))))))] [ansi(h,%q0)] [ansi(gh,repeat(=,5))]
+
+&help`cmd.helpcmd-db %vd=$+helpcmd/db: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,The Help DB Object is [get(%vi/help`db)].)]
+
+@@ @@@@@@@@@@@@@
+@@ +help
+&help`fun.help-notopic %ve=switch(1,not(ufun(%ve/help`fun.canuse,%0,%#)),Permission denied.,ufun(%ve/help`fun.hasindex,%0),ufun(%ve/help`fun.show,%0,INDEX,ufun(%ve/help`fun.show-index,%0),),gt(ufun(%ve/help`fun.count-topics,%0,*),0),ufun(%ve/help`fun.show,%0,INDEX,ufun(%ve/help`fun.show-topiclist,%0),),There are no topics available.)
+
+@@ %0 = id of help command, %1 = topic name, %2 = content to show, %3 = footer text
+&help`fun.show %ve=ufun(%ve/help`header,%0,edit(%1,_,%b))%2[ufun(%ve/help`footer,%0,edit(%1,_,%b),%3)]
+
+&help`fun.show-index %ve=ufun(get(%vi/help`db)/%0`index)
+&help`fun.show-topiclist %ve=Available Topics:%r[table(ufun(%ve/help`fun.list-topics,%0,*),18,firstof(width(%#,78),78),|,%b)]
+
+@@ @@@@@@@@@
+@@ +help <topic>
+&help`fun.help-topic %ve=switch(0,ufun(%ve/help`fun.canuse,%0,%#),Permission denied.,strlen(setr(0,ufun(%ve/help`fun.matchtopic,%0,edit(%1,%b,_)))),No such topic.,ufun(%ve/help`fun.show,%0,%q0,ufun(%ve/help`fun.get-topic-text,%0,%q0),ufun(%ve/help`fun.get-footer-text,%0,%q0)))
+
+&help`fun.get-topic-text %ve=ufun(get(%vi/help`db)/%0`topic`%1)
+&help`fun.get-footer-text %ve=ufun(get(%vi/help`db)/%0`footer`%1)
+
+@@ @@@@@@@@
+@@ +help/list [<arg>]
+&help`fun.help-list %ve=switch(0,ufun(%ve/help`fun.canuse,%0,%#),Permission denied.,setr(0,ufun(%ve/help`fun.count-topics,%0,%1)),No matches.,ufun(%ve/help`fun.show,%0,TOPIC LIST,Matches for '%1':%r[table(ufun(%ve/help`list-topics,%0,%1),18,firstof(width(%#,78),78),|,%b)],%q0 match[switch(%q0,1,,es)]))
+
+@@ @@@@@@@
+@@ +help/search <string>
+&help`fun.help-search %ve=switch(0,ufun(%ve/help`fun.canuse,%0,%#),Permission denied.,words(setr(0,ufun(%ve/help`fun.searchtopics,%0,%1)),|),No matches.,ufun(%ve/help`fun.show,%0,SEARCH RESULTS,Matches for '%1':%r[table(%q0,18,firstof(width(%#,78),78),|,%b)],words(%q0,|) match[switch(%q0,*|*,es)]))
+
+
+
+@@ @@@@@@@@@@
+think ansi(h,Adding package to the Core...)
+
++TMCS/ADDPACKAGE help=+Help System/1.0/A +Help system allowing for multiple +help-style commands/\[+HELPCMD\]%b
++TMCS/REGISTER help=[get(%vi/help`db)]
+
+@@ @@@@@@@@@@
++tmcs/update
+think ansi(h,+Help System Upload Complete.)
+
+

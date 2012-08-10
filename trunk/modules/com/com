@@ -1,0 +1,295 @@
+@@ @@@@@@@@@@
+@@ +Com Code by Talvo
+@@ A part of Talvo's MUSHcode Suite from www.talvo.com
+
+
+@@ channels --> id of next channel to make
+@@ channels`<num> --> <name>
+@@ channels`<num>`members --> <list of objids>
+@@ channels`<num>`gagging --> <list of objids>
+@@ channels`<num>`header --> String to show as prefix
+@@ channels`<num>`desc --> description of channel
+@@ channels`<num>`titles --> 0 or 1 (are titles allowed on this channel?)
+@@ channels`<num>`titles`<Xobjid> --> title (<Xobjid> == edit(<objid>,:,_))
+@@ channels`<num>`lock --> code to determine if a player can join
+
+@@ toggles --> unused
+@@ toggles`nospoof --> list of nospoof objids
+@@ toggles`monitor --> list of monitor objids
+
+@@ defaults
+@@ defaults`<Xobjid> --> <Xobjid>'s default channel id
+
+
+@@ @@@@@@@@@@
+think ansi(h,Creating +Com Database...)
+
+@set me=XC:[create(+COM Database)]
+@lock/control %xc=$me
+
+think ansi(h,Installing +Com Code...)
+
+
+@set %xc=CHANNELS:1
+
+@@ Who can add channels
+@lock/user:create %xc=flag^wizard|flag^royalty
+@@ Who can +com/cemit
+@lock/user:cemit %xc=flag^wizard|flag^royalty|power^cemit
+@@ Who can delete channels
+@lock/user:delete %xc=flag^wizard
+@@ Who can edit (desc, header, locks, etc) channels
+@lock/user:edit %xc=@%xc/create
+@@ Who can +com/mute and +com/unmute
+@lock/user:mute %xc=(flag^wizard|flag^royalty|power^chat_privs)&!flag^chatmute
+
+@@ A safety-lock, in case of errors.
+@lock/user:chan-0 %xc=#false
+
+@@ @@@@@@@@@@
+
+&com`fun.valid-channel-name %ve=regmatch(%0,^\[a-zA-Z0-9_-\]\{3\,15\}$)
+
+&com`fun.header %ve=if(hasattrval(%xc,channels`%0`header),ufun(%xc/channels`%0`header,get(%xc/channels`%0)),ansi(hi,<[get(%xc/channels`%0)]>))
+
+@@ %0 = channel num, %1 = objid
+&com`fun.is-on %ve=t(member(get(%xc/channels`%0`members),%1))
+
+@@ @@@@@@@@@@
+@@ FUN.FIND-CHANNEL-[name|number]
+@@ %0 = channel name, %1 = dbref of searching player, %2 = allow partial matches?
+&com`fun.find-channel-sub %ve=localize(switch(1,eq(strlen(%0),0),,firstof(words(setr(0,matchall(get(%xc/channels`names),%0,|))),cand(%2,eq(words(setr(0,matchall(get(%xc/channels`names),%0*,|)),|),1)),cand(%2,hasflag(%1,chan_usefirstmatch),strlen(setr(0,first(%q0,|)))),0),%q0))
+
+&com`fun.find-channel-name %ve=switch(eval(me,com`fun.find-channel-sub),,0,elements(get(%xc/channels`names),#$,|))
+&com`fun.find-channel-number %ve=switch(eval(me,com`fun.find-channel-sub),,0,elements(get(%xc/channels`numbers),#$,|))
+
+@@ A wrapper
+&com`fun.find-channel %ve=ufun(com`fun.find-channel-number,%0,%#,1)
+
+@@ @@@@@@@@@@
+@@ FUN.BROADCAST
+@@ %0 = channel id, %1 = prefix, %2 = message, %3 = allow nospoof?, %4 = speaker, %5 = monitor only?
+&com`fun.broadcast %ve=localize(setq(0,setdiff(get(%xc/channels`%0`members),get(%xc/channels`%0`gagging)))[if(%5,setq(0,setinter(%q0,get(%xc/toggles`monitor))))][setq(1,if(strlen(%1),%1%b,))][if(%3,setq(2,setinter(%q0,get(%xc/toggles`nospoof)))[setq(3,setdiff(%q0,%q2))][nspemit(%q2,%q1\[%4\] %2)][nspemit(%q3,%q1%2)],nspemit(%q0,%q1%2))])
+
+@@ @@@@@@@@@@
+@@ +com/create
+&com`cmd.create %vd=$+com/create *: @nspemit/silent %#=ufun(%ve/tag,com)[switch(0,elock(%xc/create,%#),Permission denied.,ufun(%ve/com`fun.valid-channel-name,%0),That is not a valid channel name.,ufun(%ve/com`fun.find-channel-name,%0),ufun(%ve/com`fun.create,%0)Channel created.,A channel named '%0' already exists.)]
+
+@@ The lock() is done twice, once using u:lockname (as user: was once broken),
+@@ and once using user:lockname (as u: no longer works).
+&com`fun.create %ve=null(localize(setq(0,get(%xc/channels))[attrib_set(%xc/channels,add(%q0,1))][attrib_set(%xc/channels`%q0,%0)][attrib_set(%xc/channels`%q0`members,)][attrib_set(%xc/channels`%q0`gagging,)][attrib_set(%xc/channels`%q0`titles,0)][attrib_set(%xc/channels`%q0`lock,0)][lock(%xc/u:chan-%q0,channels`%q0`lock/1)][lock(%xc/user:chan-%q0,channels`%q0`lock/1)][attrib_set(%xc/channels`names,squish(insert(get(%xc/channels`names),1,%0,|),|))][attrib_set(%xc/channels`numbers,squish(insert(get(%xc/channels`numbers),1,%q0,|),|))][@@(We don't set channels`%q0`header so we can use udefault to use a default header.)]))
+
+@@ @@@@@@@@@@
+@@ +com/[c]emit
+&com`cmd.cemit %vd=$+com/cemit *=*: @nspemit/silent %#=ufun(%ve/com`fun.cemit,%0,%1)
+&com`cmd.emit %vd=$+com/emit *=*: @nspemit/silent %#=ufun(%ve/com`fun.cemit,%0,%1)
+
+@@ Note this is the stub to +com/cemit, not the code for cemit().
+&com`fun.cemit %ve=switch(0,elock(%xc/cemit,%#),Permission denied.,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,ufun(com`fun.broadcast,%q0,ufun(com`fun.header,%q0),%1,0,%#))
+
+&com`fun.cemit-@function %ve=localize(switch(0,elock(%xc/cemit,%@),#-1 PERMISSION DENIED,setr(0,ufun(com`fun.find-channel,%0)),#-1 NO SUCH CHANNEL,ufun(com`fun.broadcast,%q0,if(%2,ufun(com`fun.header,%q0)),%1,0,%@)))
+
+@@ @@@@@@@@@@
+@@ +COM/DEFAULT [<channel>]
+&com`cmd.default %vd=$+com/default: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.default)]
+&com`cmd.default-args %vd=$+com/default *: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.default-args,%0)]
+
+&com`fun.default %ve=if(hasattrval(%xc,defaults`[edit(%:,:,_)]),Your default channel is [get(%xc/channels`[get(%xc/defaults`[edit(%:,:,_)])])].,You have no default channel set.)
+&com`fun.default-args %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,ufun(com`fun.is-on,%q0,%:),You aren't on that channel.,You set your default channel as [get(%xc/channels`%q0)].[attrib_set(%xc/defaults`[edit(%:,:,_)],%q0)])
+
+@@ @@@@@@@@@@
+@@ +COM/DELETE <channel>
+&com`cmd.delete %vd=$+com/delete *: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.delete,%0)]
+
+&com`fun.delete %ve=switch(0,elock(%xc/delete,%#),Permission denied.,setr(0,ufun(com`fun.find-channel-number,%0,%#,0)),No such channel.,Channel deleted.[null(setq(1,member(get(%xc/channels`numbers),%q0,|))[wipe(%xc/channels`%q0)][lock(%xc/chan-%q0,)][attrib_set(%xc/channels`names,ldelete(get(%xc/channels`names),%q1,|))][attrib_set(%xc/channels`numbers,ldelete(get(%xc/channels`numbers),%q1,|))])])
+
+@@ @@@@@@@@@@
+@@ +COM/DESC <channel>=<desc>
+&com`cmd.desc %vd=$+com/desc *=*: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.desc,%0,%1)]
+
+&com`fun.desc %ve=switch(0,elock(%xc/edit,%#),Permission denied.,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,attrib_set(%xc/channels`%q0`desc,%1)Channel [if(strlen(%1),set,cleared)].)
+
+@@ @@@@@@@@@@
+@@ +COM/GAG <channel>
+@@ +COM/UNGAG <channel>
+&com`cmd.gag-one %vd=$+com/gag *: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.gag-one,%0)]
+&com`cmd.gag-all %vd=$+com/gag: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.gag-all)]
+&com`cmd.haven-one %vd=$+com/haven *: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.gag-one,%0)]
+&com`cmd.haven-all %vd=$+com/haven: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.gag-all)]
+
+&com`cmd.ungag-one %vd=$+com/ungag *: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.ungag-one,%0)]
+&com`cmd.ungag-all %vd=$+com/ungag: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.ungag-all)]
+
+&com`fun.gag-one %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,ufun(com`fun.is-on,%q0,%:),You aren't on that channel.,member(get(%xc/channels`%q0`gagging),%:),You gag [get(%xc/channels`%q0)].[attrib_set(%xc/channels`%q0`gagging,setunion(get(%xc/channels`%q0`gagging),%:))][ufun(com`fun.broadcast,%q0,ufun(com`fun.header,%q0) [ansi(h,COM:)],%n has gagged the channel.,1,%#,1)],You're already gagging [get(%xc/channels`%q0)].)
+
+&com`fun.gag-all %ve=setq(0,iter(setdiff(lattr(%xc/channels`*),CHANNELS`NAMES CHANNELS`NUMBERS),if(member(get(%xc/##`members),%:),##)))[switch(%q0,,You aren't on any channels.,null(iter(%q0,switch(member(get(%xc/##`gagging),%:),0,attrib_set(%xc/##`gagging,setunion(get(%xc/##`gagging),%:))[ufun(com`fun.broadcast,rest(##,`),ufun(com`fun.header,rest(##,`)) [ansi(h,COM:)],%n has gagged the channel.,1,%#,1)])))You gag all channels. Type "+com/ungag" to ungag all channels.)]
+
+&com`fun.ungag-one %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,ufun(com`fun.is-on,%q0,%:),You aren't on that channel.,member(get(%xc/channels`%q0`gagging),%:),You aren't gagging [get(%xc/channels`%q0)].,You ungag [get(%xc/channels`%q0)].[ufun(com`fun.broadcast,%q0,ufun(com`fun.header,%q0) [ansi(h,COM:)],%n has ungagged the channel.,1,%#,1)][attrib_set(%xc/channels`%q0`gagging,setdiff(get(%xc/channels`%q0`gagging),%:))])
+
+&com`fun.ungag-all %ve=setq(0,iter(setdiff(lattr(%xc/channels`*),CHANNELS`NAMES CHANNELS`NUMBERS),if(member(get(%xc/##`gagging),%:),##)))[switch(%q0,,You aren't gagging any channels.,null(iter(%q0,ufun(com`fun.broadcast,rest(##,`),ufun(com`fun.header,rest(##,`)) [ansi(h,COM:)],%n has ungagged the channel.,1,%#,1)[attrib_set(%xc/##`gagging,setdiff(get(%xc/##`gagging),%:))]))You ungag all channels.)]
+
+@@ @@@@@@@@@@
+@@ GLOBAL ADISCONNECT
+
+&com`adisconnect-ungag %ve=switch(%1,0,iter(lattr(%xc/channels`*`gagging),attrib_set(%xc/##,setdiff(get(%xc/##),%:))))
+
+@@ @@@@@@@@@@
+@@ +COM/HEADER <channel>[=<header>]
+&com`cmd.header %vd=$+com/header *: @nspemit/silent %#=ufun(%ve/tag,com)[switch(%0,*=*,ufun(%ve/com`fun.header-set,before(%0,=),after(%0,=)),ufun(%ve/com`fun.header-show,%0))]
+
+&com`fun.header-show %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,hasattrval(%xc,channels`%q0`header),The default header is being used for [get(%xc/channels`%q0)]: [ufun(com`fun.header,%q0)],There is a custom header for [get(%xc/channels`%q0)]: [ufun(com`fun.header,%q0)])
+
+&com`fun.header-set %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,elock(%xc/edit,%#),Permission denied.,strlen(%1),attrib_set(%xc/channels`%q0`header)Custom header cleared for [get(%xc/channels`%q0)].,attrib_set(%xc/channels`%q0`header,%1)Custom header set for [get(%xc/channels`%q0)]: [ufun(com`fun.header,%q0)])
+
+@@ @@@@@@@@@@
+@@ +COM/INFO <channel>
+&com`cmd.info %vd=$+com/info *: @nspemit/silent %#=ufun(%ve/com`fun.info,%0)
+
+&com`fun.info %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),ufun(%ve/tag,com)No such channel.,ufun(com`fun.info-sub,%q0))
+
+&com`fun.info-sub %ve=Channel Name: [get(%xc/channels`%0)]%rChannel Header: [ufun(com`fun.header,%0)][if(hasattrval(%xc,channels`%0`desc),%rChannel Description: [get(%xc/channels`%0`desc)])]%rChannel Lock: [get(%xc/channels`%0`lock)][if(elock(%xc/chan-%0,%#),%rPeople on Channel: [words(setr(0,setinter(iter(lwho(%#),objid(##)),get(%xc/channels`%0`members))))] \([words(setinter(%q0,get(%xc/channels`%0`gagging)))] gagged\))]%rChannel Titles are [if(get(%xc/channels`%0`titles),allowed,not allowed)] on this channel.
+
+@@ @@@@@@@@@@
+@@ +COM/JOIN <channel>
+&com`cmd.join %vd=$+com/join *: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.join,%0)]
+
+&com`fun.join %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,not(member(get(%xc/channels`%q0`members),%:)),You're already on that channel.,elock(%xc/chan-%q0,%#),Permission denied.,attrib_set(%xc/channels`%q0`members,setunion(get(%xc/channels`%q0`members),%:))[ufun(com`fun.broadcast,%q0,ufun(com`fun.header,%q0) [ansi(h,COM:)],%n has joined the channel.,1,%#,1)][if(hasattrval(%xc,defaults`[edit(%:,:,_)]),,attrib_set(%xc/defaults`[edit(%:,:,_)],%q0))]You join [get(%xc/channels`%q0)].)
+
+@@ @@@@@@@@@@
+@@ +COM/LEAVE <channel>
+&com`cmd.leave %vd=$+com/leave *: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.leave,%0)]
+
+&com`fun.leave %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,member(get(%xc/channels`%q0`members),%:),You're not on that channel.,ufun(com`fun.broadcast,%q0,ufun(com`fun.header,%q0) [ansi(h,COM:)],%n has left the channel.,1,%#,1)[attrib_set(%xc/channels`%q0`members,setdiff(get(%xc/channels`%q0`members),%:))][attrib_set(%xc/channels`%q0`gagging,setdiff(get(%xc/channels`%q0`gagging),%:))][attrib_set(%xc/channels`%q0`titles`[edit(%:,:,_)])][switch(get(%xc/defaults`[edit(%:,:,_)]),%q0,setq(3,after(first(iter(setdiff(lattr(%xc/channels`*),CHANNELS`NAMES CHANNELS`NUMBERS),if(member(get(%xc/##`members),%:),##))),`))[switch(%q3,,attrib_set(%xc/defaults`[edit(%:,:,_)]),attrib_set(%xc/defaults`[edit(%:,:,_)],%q3))])]You leave [get(%xc/channels`%q0)].[if(%q3,%bYour new default channel is [get(%xc/channels`%q3)].)])
+
+@@ @@@@@@@@@@
+@@ +COM/LIST [all]
+&com`cmd.list %vd=$+com/list*: @nspemit/silent %#=ufun(%ve/tag,com)[switch(squish(%0),,ufun(%ve/com`fun.list-vis),all,ufun(%ve/com`fun.list-all),What do you want to list?)]
+
+&com`fun.list %ve=%0%r[table(%1,17,78,|,%b)][if(strlen(%2),%r%2)]
+
+&com`fun.list-vis %ve=setq(0,squish(iter(edit(setdiff(lattr(%xc/channels`*),CHANNELS`NAMES CHANNELS`NUMBERS),CHANNELS`,),if(elock(%xc/chan-##,%#),get(%xc/channels`##)[if(member(get(%xc/channels`##`members),%:),*)]),,|),|))[switch(words(%q0,|),0,You can't join any channels.,u(com`fun.list,Channels you can join:,%q0,"+com/list all" lists all channels on the game.))]
+
+&com`fun.list-all %ve=u(com`fun.list,All channels on the game:,iter(setdiff(lattr(%xc/channels`*),CHANNELS`NAMES CHANNELS`NUMBERS),get(%xc/##)[if(member(get(%xc/##`members),%:),*)],,|),"+com/on" lists channels you're on.)
+
+@@ @@@@@@@@@@
+@@ +COM/ON [<player>]
+&com`cmd.on %vd=$+com/on*: @nspemit/silent %#=ufun(%ve/tag,com)[switch(0,strlen(squish(%0)),ufun(%ve/com`fun.on-all),t(setr(0,pmatch(squish(%0)))),No such player '[squish(%0)]'.,member(lwho(%#),%q0),name(%q0) is not online.,ufun(%ve/com`fun.on-with,objid(%q0)))]
+
+&com`fun.on-all %ve=setq(0,squish(iter(setdiff(lattr(%xc/channels`*),CHANNELS`NAMES CHANNELS`NUMBERS),if(member(get(%xc/##`members),%:),get(%xc/##)[if(member(get(%xc/##`gagging),%:),+)]),,|),|))[switch(words(%q0,|),0,You aren't on any channels.,ufun(com`fun.list,You are on these channels:,%q0,"+com/off" lists channels you can join but aren't on))]
+
+&com`fun.on-with %ve=setq(0,squish(iter(setdiff(lattr(%xc/channels`*),CHANNELS`NAMES CHANNELS`NUMBERS),switch(setinter(get(%xc/##`members),%: %0),* *,get(%xc/##)),,|),|))[switch(words(%q0,|),0,You have no channels in common with [name(%0)].,ufun(com`fun.list,You have the following channels in common with [name(%0)]:,%q0))]
+
+@@ @@@@@@@@@@
+@@ +COM/OFF
+&com`cmd.off %vd=$+com/off: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.off)]
+
+&com`fun.off %ve=setq(0,squish(iter(edit(setdiff(lattr(%xc/channels`*),CHANNELS`NAMES CHANNELS`NUMBERS),CHANNELS`,),if(cand(elock(%xc/chan-##,%#),not(member(get(%xc/channels`##`members),%:))),get(%xc/channels`##)),,|),|))[switch(words(%q0,|),0,You are already on all the channels you can join.,ufun(com`fun.list,You can still join these channels:,%q0))]
+
+@@ @@@@@@@@@@
+@@ +COM/LOCK <channel>=<lock>
+&com`cmd.lock %vd=$+com/lock *=*: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.lock,%0,%1)]
+
+&com`fun.lock %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,elock(%xc/edit,%#),Permission denied.,strlen(%1),What do you want to set the lock to?,attrib_set(%xc/channels`%q0`lock,%1)Lock set.)
+
+@@ @@@@@@@@@@
+@@ +COM/MUTE <player>
+&com`cmd.mute %va=$+com/mute *: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%vb/com`fun.mute,%0)]
+
+&com`fun.mute %vb=switch(0,elock(%xc/mute,%#),Permission denied.,t(setr(0,pmatch(%0))),No such player.,comp(%#,%q0),Muting yourself is silly.,not(ufun(%ve/com`fun.is-muted,%q0)),That player is already muted.,set(%q0,chatmute)[nspemit(%q0,ufun(%ve/tag,com)%n has +com/mute'd you. You will no longer be able to speak on the com. Please page %o if you have any questions.)][ufun(%vb/com`fun.mail-notify,%q0,+Com/Mute,name(%q0)\,%r%r%n has +com/mute'd you. You will be unable to speak on the com system until an admin unmutes you. If you haven't been told why you were muted\, please contact %n or another admin.%r%r-- +COM)]You mute [name(%q0)]. [capstr(subj(%q0))] can no longer speak on the chat system. Please make sure you inform [obj(%q0)] of the reasons for this.)
+
+&com`fun.is-muted %ve=words(setinter(setinter(CHATMUTE,lflags()),lflags(%0)))
+
+@@ %0 = player to notify, %1 = subject, %2 = message
+&com`fun.mail-notify %vb=null(sendmail(%#,%0,%1,%2))[@@(My +Mail system)]
+&com`fun.mail-notify %vb=null(mailsend(%0,%1/%2))[@@(Default Penn @mail)]
+
+
+@@ @@@@@@@@@@
+@@ +COM/UNMUTE <player>
+&com`cmd.unmute %va=$+com/unmute *: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%vb/com`fun.unmute,%0)]
+
+&com`fun.unmute %vb=switch(0,elock(%xc/mute,%#),Permission denied.,t(setr(0,pmatch(%0))),No such player.,comp(%#,%q0),You can't unmute yourself.,ufun(%ve/com`fun.is-muted,%q0),That player is not muted.,set(%q0,!chatmute)[nspemit(%q0,ufun(%ve/tag,com)%n has +com/unmute'd you. You can now speak on the com again.)]You unmute [name(%q0)].)
+
+@@ @@@@@@@@@@
+@@ +COM/TITLES
+@@ +COM/TITLE <channel>[=<title>]
+&com`cmd.titles %vd=$+com/titles: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.titles-all)]
+&com`cmd.title %vd=$+com/title: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.titles-all)]
+&com`cmd.title-arg %vd=$+com/title *: @nspemit/silent %#=ufun(%ve/tag,com)[switch(%0,*=*,ufun(%ve/com`fun.title-set,before(%0,=),after(%0,=)),ufun(%ve/com`fun.title-see,%0))]
+
+&com`fun.titles-all %ve=setq(0,lattr(%xc/channels`*`titles`[edit(%:,:,_)]))[switch(words(%q0),0,You have no titles set.,You have the following titles set:%r[iter(%q0,ljust(get(%xc/channels`[elements(##,2,`)]),18)[get(%xc/##)],,%r)])]
+
+&com`fun.title-see %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,hasattrval(%xc,channels`%q0`titles`[edit(%:,:,_)]),You have no title on [get(%xc/channels`%q0)].,Your title on [get(%xc/channels`%q0)] is [get(%xc/channels`%q0`titles`[edit(%:,:,_)])])
+
+&com`fun.title-set %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,member(get(%xc/channels`%q0`members),%:),You aren't on that channel.,strlen(setr(1,left(stripansi(%1),23))),attrib_set(%xc/channels`%q0`titles`[edit(%:,:,_)])Title for [get(%xc/channels`%q0)] cleared.,attrib_set(%xc/channels`%q0`titles`[edit(%:,:,_)],%q1)Title for [get(%xc/channels`%q0)] set to %q1.[if(get(%xc/channels`%q0`titles),,%b\(Note: Titles are currently disabled on this channel.\))])
+
+@@ @@@@@@@@@@
+@@ +COM/TOGGLES
+@@ +COM/TOGGLE <toggle>=<bool>
+&com`cmd.toggles %vd=$+com/toggles: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.toggles)]
+&com`cmd.toggle %vd=$+com/toggle: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.toggles)]
+&com`cmd.toggle-arg %vd=$+com/toggle *=*: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.toggle-set,%0,%1)]
+
+&com`fun.toggles %ve=You have NOSPOOF toggled [if(member(get(%xc/toggles`nospoof),%:),ON,OFF)]. You have MONITOR toggled [if(member(get(%xc/toggles`monitor),%:),ON,OFF)].
+
+&com`fun.toggle-set %ve=switch(0,strlen(setr(0,graball(|MONITOR|NOSPOOF,%0*,|))),Which toggle do you want to set?,strlen(setr(1,ufun(com`fun.parse-bool,%1))),How do you want to set the toggle?,You turn %q0 [if(%q1,ON,OFF)].[attrib_set(%xc/toggles`%q0,set[if(%q1,union,diff)](get(%xc/toggles`%q0),%:))])
+
+&com`fun.parse-bool %ve=switch(%0,on,1,off,0,yes,1,no,0,1,1,0,0,)
+
+@@ @@@@@@@@@@
+@@ +COM/CHANTITLES <channel>=<bool>
+&com`cmd.chantitles %vd=$+com/chantitles *=*: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.chantitles,%0,%1)]
+
+&com`fun.chantitles %ve=switch(0,elock(%xc/edit,%#),Permission denied.,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,strlen(setr(1,ufun(com`fun.parse-bool,%1))),How do you want to set the chantitles?,Chantitles for [get(%xc/channels`%q0)] turned [if(%q1,on,off)].[attrib_set(%xc/channels`%q0`titles,%q1)])
+
+@@ @@@@@@@@@@
+@@ +COM/WHO <channel>
+&com`cmd.who %vd=$+com/who *: @nspemit/silent %#=ufun(%ve/tag,com)[ufun(%ve/com`fun.who,%0)]
+
+&com`fun.who %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),No such channel.,member(get(%xc/channels`%q0`members),%:),You aren't on that channel.,words(setr(1,setinter(get(%xc/channels`%q0`members),iter(lwho(%#),objid(##))))),There are no people on that channel.,Members of [get(%xc/channels`%q0)]:%r[setq(2,get(%xc/channels`%q0`gagging))][itemize(iter(sort(%q1,namei),name(##)[if(member(%q2,##),%b\(gagging\))],,|),|)])
+
+@@ @@@@@@@@@@
+@@ SPEAKING!
+@@ +COM <channel>=<msg>
+@@ +COM/SPEAK <channel>=<msg>
+@@ ,<channel> <msg>
+@@ =<msg>
+&com`cmd.speak1 %vd=$+com *=*: @nspemit/silent %#=ufun(%ve/com`fun.speak,%0,%1)
+&com`cmd.speak2 %vd=$+com/speak *=*: @nspemit/silent %#=ufun(%ve/com`fun.speak,%0,%1)
+&com`cmd.speak3 %vd=$,* *: @nspemit/silent %#=ufun(%ve/com`fun.speak,%0,%1)
+&com`cmd.speak-def %vd=$=*: @nspemit/silent %#=ufun(%ve/com`fun.speak-def,%0)
+
+&com`fun.speak %ve=switch(0,setr(0,ufun(com`fun.find-channel,%0)),ufun(%ve/tag,com)No such channel.,nor(ufun(%ve/com`fun.is-muted,%#),hasflag(%#,gagged)),ufun(%ve/tag,com)You cannot speak while muted.,member(get(%xc/channels`%q0`members),%:),ufun(%ve/tag,com)You aren't on that channel.,not(member(get(%xc/channels`%q0`gagging),%:)),ufun(%ve/tag,com)You can't talk on a channel you're gagging.,ufun(com`fun.talk,%q0,%1))
+
+&com`fun.speak-def %ve=switch(0,hasattrval(%xc,defaults`[edit(%:,:,_)]),ufun(%ve/tag,com)You have no default channel set.,nor(ufun(%ve/com`fun.is-muted,%#),hasflag(%#,gagged)),ufun(%ve/tag,com)You cannot speak while muted.,not(member(get(%xc/channels`[setr(0,get(%xc/defaults`[edit(%:,:,_)]))]`gagging),%:)),ufun(%ve/tag,com)You can't talk on a channel you're gagging.,ufun(com`fun.talk,%q0,%0))
+
+&com`fun.talk %ve=ufun(com`fun.broadcast,%0,ufun(com`fun.header,%0),if(cand(get(%xc/channels`%0`titles),hasattrval(%xc,channels`%0`titles`[edit(%:,:,_)])),get(%xc/channels`%0`titles`[edit(%:,:,_)])%b)%n[switch(%1,:*,%b[after(%1,:)],;*,[after(%1,;)],%bsays\, "[switch(%1,"*,after(%1,"),%1)]")],1,%#)
+
+@@ @@@@@@@@@@
+@@ Purge routine and startup attrs
+
+&com`trg.cleanup %ve=@wait 302400=@trigger me/com`trg.cleanup ; @trigger me/com`trg.cleanup-sub1 ; @dolist [setdiff(lattr(%xc/channels`*),CHANNELS`NAMES CHANNELS`NUMBERS)]=@trigger me/com`trg.cleanup-sub2=##
+
+&com`trg.cleanup-sub1 %ve=th attrib_set(%xc/toggles`nospoof,filterbool(#lambda/num\(%%0\),get(%xc/toggles`nospoof)))[attrib_set(%xc/toggles`monitor,filterbool(#lambda/num\(%%0\),get(%xc/toggles`monitor)))][iter(lattr(%xc/defaults`*),if(num(edit(last(##,`),_,:)),,attrib_set(%xc/##)))]
+
+&com`trg.cleanup-sub2 %ve=think attrib_set(%xc/%0`members,filterbool(#lambda/num\(%%0\),get(%xc/%0`members)))[attrib_set(%xc/%0`gagging,filterbool(#lambda/num\(%%0\),get(%xc/%0`gagging)))][iter(lattr(%xc/%0`titles`*),if(num(edit(last(##,`),_,:)),,attrib_set(%xc/##)))]
+
+
+think ansi(h,Adding Startup Attributes...)
+
+&com`TRG`cleanup %vs=%ve/com`trg.cleanup
+&com`MISC`disable-emit %vs=@function/disable cemit
+&com`FUN`cemit %vs=%ve,com`fun.cemit-@function,2,3
+
+
+@@ @@@@@@@@@@
+@@ Register package
+
+think ansi(h,Registering COM package with the Core...)
+
++TMCS/ADDPACKAGE com=+Com/1.4/A +com (chat) system to replace the built-in PennMUSH @chat system/\[+COM\]%b
++TMCS/REGISTER com=%xc
++TMCS/UPDATE
+
+
+think ansi(h,Upload complete. Please have #1 [ansi(gh,@FLAG/ADD CHATMUTE=,any,wizard,wizard)] to finish the installation.)

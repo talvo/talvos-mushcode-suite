@@ -1,0 +1,140 @@
+& 78
+------------------------------------------------------------------------------
+
+& TMCS HELP
+& +HELPCMD
+
+  The +helpcmd system allows you to set up softcoded help-systems easily. The
+  following commands are available (see 'help <command>' for more info):
+
+  +HELPCMD/ADD       +HELPCMD/TOPIC     +HELPCMD/LIST      +HELPCMD/INDEX
+  +HELPCMD/FOOTER    +HELPCMD/INDEX     +HELPCMD/LOCK      +HELPCMD/DB
+
+  +HELPCMD ATTRIBUTES explains the attribute format used.
+  +HELPCMD EXAMPLE shows a brief example of using the system.
+
+& +HELPCMD EXAMPLE
+
+  +helpcmd/add +help=
+    You see: [+HELPCMD] Help command '+help' added as command number '0'
+
+  ]+helpcmd/index 0=[mudname()] Help Topics:%r[table(Foo Bar Baz,10,78)]
+    This sets the "index" page, shown when +help is typed with no topic
+
+  ]+helpcmd/topic 0=Foo,This is '+help foo'.%r%rText goes here
+    Adds the topic "+help foo"
+
+  ]+helpcmd/footer 0=Foo,See also +HELP BAR
+    Sets the footer for "+help foo"
+
+& +HELPCMD/DB
+
+  +HELPCMD/DB
+
+  This command shows the dbref number of the Help DB object. If you have
+  lots of helpfiles you want to add manually, rather than individually with
+  +helpcmd/topic, you'll need to know this.
+
+  See also +HELPCMD ATTRIBUTES.
+
+& +HELPCMD ATTRIBUTES
+
+  The attribute format for help topics is <commandID>`TOPIC`<topicname>, where
+  <topicname> is the topic with any spaces replaced with underscores.
+
+  If you have help-files written for a hardcoded help system and wish to upload
+  them into the +helpcmd system, you may find the Helpfile Converter, available
+  at http://www.talvo.com/mush-helpfiles.php helpful. For this system, the
+  attribute name format is <commandID>`topic`%s (see +helpcmd/list to get the
+  correct <commandID>), and the Object Dbref can be found with +helpcmd/db.
+  Spaces should be converted to Underscores, as mentioned above.  
+
+& +HELPCMD/ADD
+
+  +HELPCMD/ADD <command>=<lock>
+
+  This command adds a new softcoded help command, making the following commands
+  available:
+
+  <command> - show the help index
+  <command> <topic> - show help topic <topic>
+  <command>/list [<pattern>] - show all topic names, or all topic names matching
+                               the wildcard <pattern>
+  <command>/search <pattern> - show all topics whose text match the given
+                               wildcard <pattern>
+
+  <lock> is an @lock-style lock which controls who can use the commands.
+  See HELP +HELPCMD/LOCK and HELP @LOCK for more info.
+
+  When a command is added, it's given a unique id number which can be used in
+  other +helpcmd commands.
+
+  Example:
+  +HELPCMD/ADD +help=#true
+  +HELPCMD/ADD +ahelp=flag^wizard|flag^royalty
+
+& +HELPCMD/LOCK
+
+  +HELPCMD/LOCK <commandID>=<lock>
+
+  This command re-locks a help command created with +helpcmd/add. <commandID>
+  is the id for the command shown at creation.
+
+  <lock> is the new @lock-style lock to use for the command. Evaluation locks
+  (<obj>/<attr>) and indirect locks (@<obj>/<lock>) are not allowed. If <lock>
+  is an empty string, it defaults to #TRUE, allowing anyone to use the command.
+
+& +HELPCMD/DELETE
+
+  +HELPCMD/DELETE <commandID>
+
+  This command completely deletes a help command created with +helpcmd/add, and
+  all it's help topics. It can only be used by wizards, and cannot be undone.
+
+& +HELPCMD/LIST
+
+  +HELPCMD/LIST
+
+  This command lists all the help commands created with +helpcmd/add, along with
+  their unique id numbers (the <commandID> arg used by other +helpcmd commands)
+  and their current lock.
+
+& +HELPCMD/INDEX
+
+  +HELPCMD/INDEX <commandID>=[<text>]
+
+  This command sets the index page for the help command specified by <commandID>
+  (or clears it, if <text> is omitted). The index page is shown when a help command
+  is typed with no topic name (ie, '+help' rather than '+help foo'). If no index
+  page is set (because <text> was omitted), a list of all topics is shown instead.
+
+& +HELPCMD/TOPIC
+
+  +HELPCMD/TOPIC <commandID>=<topicname>,[<text>]
+
+  This command adds a topic named <topicname> for the given help command with the
+  body <text>. If a topic already exists it will be updated. If <text> is omitted,
+  the topic is removed.
+
+  <text> is evaluated when the command is used, so if it contains any special
+  characters or MUSHcode (including new lines or ANSI), you may want to precede the
+  command with ']' to stop it evaluating.
+
+  Example:
+  ]+helpcmd/topic 0=test,This is [ansi(rh,a test)] topic.%r%rWhee.
+
+& +HELPCMD/FOOTER
+
+  +HELPCMD/FOOTER <commandID>=<topicname>,[<text>]
+
+  This command sets the footer for the topic <topicname> in the given help command
+  to <text>, or clears it if <text> is omitted. The footer text is shown in the
+  footer below the help topic.
+
+  Example:
+  +helpcmd/footer 0=foo,Continued in +Help Foo2
+
+& +HELPCMD CHANGES
+
+  v1.0  - Apr 05 2008 - Initial Release
+

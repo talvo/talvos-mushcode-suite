@@ -1,0 +1,71 @@
+@@ @@@@@@@@@@
+@@ Wardrobe Code by Talvo
+@@ A part of Talvo's MUSHcode Suite from www.talvo.com
+
+@@ @@@@@@@@@@
+think ansi(h,Adding Wardrobe commands...)
+
+&wardrobe`cmd.wardrobe %va=$^\+wardrobe(/table(?\: (.+))?)?$: @nspemit/silent %#=ufun(%ve/tag,wardrobe)[switch(0,strlen(%1),ufun(%vb/wardrobe`fun.wardrobe,objid(owner(%#))),strlen(%2),ufun(%ve/wardrobe`fun.table-show),ufun(%vb/wardrobe`fun.table-set,%2))]
+@set %va/wardrobe`cmd.wardrobe=regexp
+&wardrobe`fun.wardrobe %vb=switch(setr(0,sql(SELECT `name` FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid` = '[sqlescape(%0)]' ORDER BY `name`)),,You have no saved descriptions. See HELP WARDROBE for how to save them.,#-1,You have no saved descriptions. See HELP WARDROBE for how to save them.,You have [switch(words(%q0),1,1 description,words(%q0) descriptions)] saved:%r[itemize(%q0)])
+
+&wardrobe`cmd.wwhich %vd=$+wwhich: @nspemit/silent %#=ufun(%ve/tag,wardrobe)[ufun(%ve/wardrobe`fun.wwhich)]
+&wardrobe`fun.wwhich %vb=switch(0,hasattr(%#,describe),You don't have a description set.,cand(match(owner(%!),owner(%#/describe)),hasattr(%#,wardrobe)),You aren't wearing anything from your wardrobe.,You are wearing these descs from your wardrobe:%r[get(%#/wardrobe)])
+
+&wardrobe`cmd.wsave %va=$+wsave *: @nspemit/silent %#=ufun(%ve/tag,wardrobe)[ufun(%vb/wardrobe`fun.wsave,%0)]
+&wardrobe`fun.wsave %vb=switch(0,hastype(%#,PLAYER),Only players can save descriptions.,regmatch(setr(0,ucstr(%0)),^\[A-Z0-9_-\]\{1\,25\}$),That isn't a valid name for a description.,hasattrpval(%#,describe),You don't have a description set!,not(sql(SELECT COUNT(`id`) FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid`='[sqlescape(%:)]' AND `name`='[sqlescape(%q0)]')),You already have a description with that name saved. Type +WREPLACE %q0 to overwrite it.,null(sql(INSERT INTO `[sqlescape(get(%ve/wardrobe`tablename))]`(`objid`\,`name`\,`text`) VALUES('[sqlescape(%:)]'\,'[sqlescape(%q0)]'\,'[sqlescape(get(%#/describe))]')))Your current description has been saved as '%q0'.)
+
+&wardrobe`cmd.wreplace %va=$+wreplace *: @nspemit/silent %#=ufun(%ve/tag,wardrobe)[ufun(%vb/wardrobe`fun.wreplace,%0)]
+&wardrobe`fun.wreplace %vb=switch(0,hastype(%#,PLAYER),Only players can save descriptions.,regmatch(setr(0,ucstr(%0)),^\[A-Z0-9_-\]\{1\,25\}$),That isn't a valid name for a description.,hasattrpval(%#,describe),You don't have a description set!,sql(SELECT COUNT(`id`) FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid`='[sqlescape(%:)]' AND `name`='[sqlescape(%q0)]'),You don't have a description with that name. Type +WSAVE %q0 to save a new description.,null(sql(UPDATE `[sqlescape(get(%ve/wardrobe`tablename))]` SET `text`='[sqlescape(get(%#/describe))]' WHERE `objid`='[sqlescape(%:)]' AND `name`='[sqlescape(%q0)]'))Description '%q0' updated.)
+
+&wardrobe`cmd.wstore %va=$(?s)^\+wstore(?\:/n(?\:o(?\:e(?\:v(?\:al?)?)?)?)?)? *([^=]*)=?(.*)$: @nspemit/silent %#=ufun(%ve/tag,wardrobe)[ufun(%vb/wardrobe`fun.wstore,%1,%2)]
+@set %va/wardrobe`cmd.wstore=regexp
+&wardrobe`fun.wstore %vb=switch(0,hastype(%#,PLAYER),Only players can save descriptions.,regmatch(setr(0,ucstr(%0)),^\[A-Z0-9_-\]\{1\,25\}$),That isn't a valid name for a description.,strlen(squish(%1)),What do you want to save?,not(sql(SELECT COUNT(`id`) FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid`='[sqlescape(%:)]' AND `name`='[sqlescape(%q0)]')),You already have a description with that name saved. Delete it first with +WERASE %q0 then try setting it again.,null(sql(INSERT INTO `[sqlescape(get(%ve/wardrobe`tablename))]`(`objid`\,`name`\,`text`) VALUES('[sqlescape(%:)]'\,'[sqlescape(%q0)]'\,'[sqlescape(%1)]')))Description saved as '%q0'.)
+
+&wardrobe`cmd.werase %va=$+werase *: @nspemit/silent %#=ufun(%ve/tag,wardrobe)[ufun(%vb/wardrobe`fun.werase,%0)]
+&wardrobe`fun.werase %vb=switch(0,hastype(%#,PLAYER),Only players can delete descriptions.,sql(SELECT COUNT(`id`) FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid` = '[sqlescape(%:)]' AND `name` = '[sqlescape(setr(0,ucstr(%0)))]'),You don't have a description with that name.,null(sql(DELETE FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid` = '[sqlescape(%:)]' AND `name` = '[sqlescape(%q0)]'))Description '%q0' deleted.)
+
+&wardrobe`cmd.wexam %va=$+wexam *: @nspemit/silent %#=ufun(%ve/tag,wardrobe)[ufun(%vb/wardrobe`fun.wexam,objid(owner(%#)),%0)]
+&wardrobe`fun.wexam %vb=switch(0,sql(SELECT COUNT(`id`) FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid`='[sqlescape(%0)]' AND `name`='[sqlescape(setr(0,ucstr(%1)))]'),You have no '%q0' description saved.,Description '%q0' (unevaluated):%r[sql(SELECT `text` FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid`='[sqlescape(%0)]' AND `name`='[sqlescape(%q0)]')])
+
+&wardrobe`cmd.weval %va=$+weval *: @nspemit/silent %#=ufun(%ve/tag,wardrobe)[ufun(%vb/wardrobe`fun.weval,objid(owner(%#)),%0)]
+&wardrobe`fun.weval %vb=switch(0,sql(SELECT COUNT(`id`) FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid`='[sqlescape(%0)]' AND `name`='[sqlescape(setr(0,ucstr(%1)))]'),You have no '%q0' description saved.,Description '%q0' (evaluated):%r[mapsql(#lambda/objeval\(%%#\,s\(%%1\)\),SELECT `text` FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid`='[sqlescape(%0)]' AND `name`='[sqlescape(%q0)]')])
+
+&wardrobe`cmd.wwear %va=$+wwear *: @nspemit/silent %#=ufun(%ve/tag,wardrobe)[ufun(%vb/wardrobe`fun.wwear,objid(owner(%#)),%0)]
+&wardrobe`fun.wwear %vb=switch(0,words(%1),Which descriptions do you want to set?,eq(words(setunion(ucstr(%1),)),words(setr(0,sql(SELECT `name` FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid` = '[sqlescape(%0)]' AND `name` IN([edit(setr(1,iter(%1,'[sqlescape(ucstr(itext(0)))]')),%b,\,)]))))),You don't have these descriptions: [setdiff(ucstr(%1),%q0)],Description set.[attrib_set(%#/describe,iter(ucstr(%1),sql(SELECT `text` FROM `[sqlescape(get(%ve/wardrobe`tablename))]` WHERE `objid`='[sqlescape(%0)]' AND `name`='[sqlescape(itext(0))]')))][atrlock(%#/describe,ON)][atrlock(%#/describe,OFF)][attrib_set(%#/wardrobe,ucstr(squish(%1)))])
+
+&wardrobe`fun.table-show %ve=switch(0,hasflag(%#,Wizard),Permission denied.,strlen(squish(get(%ve/wardrobe`tablename))),There is currently no MySQL table set.,The MySQL table used by the wardrobe system is `[get(%ve/wardrobe`tablename)]`.)
+
+&wardrobe`fun.table-set %vb=switch(0,hasflag(%#,wizard),Permission denied.,regmatch(%0,^\[a-zA-Z0-9_-\]\{1\,50\}$),That is not a valid table name.,not(sql(SELECT count(*) FROM `information_schema`.`tables` WHERE `table_name` = '[sqlescape(%0)]')),There's already a table with that name.,switch(sql(ufun(%ve/wardrobe`fun.table-set-query-[setr(0,switch(squish(get(%ve/wardrobe`tablename)),,create,rename))],sqlescape(%0))),#-1*,Unable to %q0 table.,Table %q0d.[attrib_set(%ve/wardrobe`tablename,%0)][set(%va/wardrobe`cmd*,!no_command)][set(%ve/wardrobe`cmd*,!no_command)]))
+
+&wardrobe`fun.table-set-query-create %ve=CREATE TABLE `%0` (  `id` int(11) NOT NULL auto_increment,  `objid` tinytext NOT NULL,  `name` text NOT NULL,  `text` text NOT NULL,  PRIMARY KEY  (`id`))
+&wardrobe`fun.table-set-query-rename %ve=RENAME TABLE `[get(%ve/wardrobe`tablename)]` TO `%0`
+
+@set %va/wardrobe`cmd*=no_command
+@set %vd/wardrobe`cmd*=no_command
+@set %va/wardrobe`cmd.wardrobe=!no_command
+
+@@ @@@@@@@@@@
+think ansi(h,Adding Startup attributes...)
+
+&wardrobe`attr`wardrobe %vs=wizard mortal_dark no_command no_inherit no_clone
+&wardrobe`cmd`+wsave %vs=|%va,wardrobe`cmd.wsave
+&wardrobe`cmd`+wreplace %vs=|%va,wardrobe`cmd.wreplace
+&wardrobe`cmd`+wardrobe %vs=|%va,wardrobe`cmd.wardrobe
+&wardrobe`cmd`+wwear %vs=|%va,wardrobe`cmd.wwear
+&wardrobe`cmd`+wwhich %vs=|%va,wardrobe`cmd.wwhich
+&wardrobe`cmd`+werase %vs=|%va,wardrobe`cmd.werase
+&wardrobe`cmd`+wexam %vs=|%va,wardrobe`cmd.wexam
+&wardrobe`cmd`+weval %vs=|%va,wardrobe`cmd.weval
+&wardrobe`cmd`+wstore %vs=/eqsplit|%va,wardrobe`cmd.wstore
+
+@@ @@@@@@@@@@
+think ansi(h,Adding package to the Core...)
+
++TMCS/ADDPACKAGE wardrobe=Wardrobe (DescChanger)/1.4b/A Wardrobe (description changer) which can store and set multiple descriptions per player, using MySQL/\[+WARDROBE\]%b
+
+@@ @@@@@@@@@@
++tmcs/update
+think ansi(h,Wardrobe Upload Complete. Please type [ansi(gh,+WARDROBE/TABLE <table>)] to create the MySQL table and finalize the installation.)
+
+

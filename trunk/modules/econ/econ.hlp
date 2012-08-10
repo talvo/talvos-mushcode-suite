@@ -1,0 +1,623 @@
+& &78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+& TMCS ECON
+& ECONOMY
+& IC MONEY
+& RESOURCES
+& COMMODITIES
+& COMMODITY
+
+  This MUSH is using Talvo's Econ System, which is used for handling money
+  and commodities.
+
+  Commands available (see HELP <command>):
+  +MONEY, +GIVE, +TAKE, +COMMODITIES, +DONATE
+
+  Functions available (see HELP <function>):
+  ECON()
+
+  Other related files:
+  ECON COMMODITIES, ECON LOCKS, ECON ATTRS, ECON EXAMPLES, +TMCS/ECON
+
+& +TMCS/ECON
+
+  This wizard-only command can be used to set up the economy system,
+  adding or removing currencies and commodities. It takes several different
+  switches which alter it's behaviour:
+
+  +TMCS/ECON/COMMODITIES
+
+  List all commodities, showing their internal name and their plural form.
+
+  +TMCS/ECON/ADDCOMMODITY <name>=<single>, <plural>, <patterns>
+
+  Adds a new commodity to the system. <name> is an internal name for the
+  commodity, and should contain only letters or numbers. <single> and
+  <plural> are the names one, or several, of the commodity, respectively
+  (for example, "lb of Wood" / "lbs of Wood", or "Frisbee" / "Frisbees").
+
+  <patterns> is a list of |-separated wildcard patterns. When someone
+  enter a commodity (for example, the "foo" in "+give Fred=5 foo"),
+  it's checked against each of these wildcard patterns. If one matches,
+  it means the item being given is this commodity.
+
+  Continued in HELP +TMCS/ECON2
+
+& +TMCS/ECON2
+
+  +TMCS/ECON/DELCOMMODITY <name>
+
+  Deletes a commodity added previously. Note that it may take several
+  seconds for this to complete, and the econ system will not be available
+  while it's running, so it's recommended you run it when there are as
+  few players online as possible.
+
+  +TMCS/ECON/ADDCURRENCY <curr>=<name>, <single>, <plural>, <patterns>
+
+  Adds a new currency, <curr>, called <name>. <single>, <plural> and
+  <patterns> are the same as for the /ADDCOMMODITY switch, and refer to
+  the lowest denomination of the currency (for example, cents or pennies).
+
+  +TMCS/ECON/DELCURRENCY <curr>
+
+  Deletes a currency. See the warning for /DELCOMMODITY.
+
+  Continued in HELP +TMCS/ECON3
+
+& +TMCS/ECON3
+
+  +TMCS/ECON/ADDDENOM <curr>=<amount>, <single>, <plural>, <patterns>
+
+  Adds a new denomination for the currency <curr> worth <amount> "pennies".
+  <single>, <plural> and <patterns> are the same as for /ADDCOMMODITY.
+
+  +TMCS/ECON/DELDENOM <curr>=<amount>
+
+  Deletes a denomination.
+
+  +TMCS/ECON/SETDENOMS <curr>=<amounts>
+
+  Sets which denominations are used when describing money in this currency.
+  For example, if you have 3 denominations, Cents (1), Quarters (25 cents),
+  and Dollars (100 cents), and you had 635 Cents, +MONEY would show...
+  String                                For <amounts>
+  ------------------------------------  --------------------
+  635 Cents                             1
+  6 Dollars, 1 Quarter, 10 Cents        1 25 100
+  25 Quarters, 10 Cents                 1 25
+
+  Even when a commodity isn't shown in the description, it's still matched
+  against input for +give and +take (so when <amounts> is '1' in the example
+  above, '+give Fred=5 dollars' would show 'You give Fred 500 Cents').
+
+  For examples, see +TMCS/ECON4
+
+& +TMCS/ECON4
+
+  Example 1: Add two commodities
+  +TMCS/ECON/ADDCOMMODITY wood=lb of Wood, lbs of Wood, w*
+  +TMCS/ECON/ADDCOMMODITY eggs=Duck Egg, Duck Eggs, de|e*|d*e*
+
+  Example 2: Add US Dollars
+  +TMCS/ECON/ADDCURRENCY USD=US Dollars, Cent, Cents, c*
+  +TMCS/ECON/ADDDENOM USD=5, Nickel, Nickels, n*
+  +TMCS/ECON/ADDDENOM USD=10, Dime, Dimes, di*
+  +TMCS/ECON/ADDDENOM USD=25, Quarter, Quarters, q*
+  +TMCS/ECON/ADDDENOM USD=100, Dollar, Dollars, do*|$|bucks
+
+  Example 3: Add British Pounds
+  +TMCS/ECON/ADDCURRENCY GBP=Pounds Sterling, Penny, Pence, p|pe*
+  +TMCS/ECON/ADDDENOM GBP=100, Pound, Pounds, po*
+
+& +MONEY
+
+  +MONEY [<object>]
+
+  Shows you the IC money and commodities <object> is carrying, or shows
+  your own if no <object> is given. In order to check an object's money,
+  you must be able to exam it, or pass it's EVIEW @lock.
+
+  See also: ECON, ECON LOCKS
+
+& +GIVE
+
+  +GIVE <object>=<commodities>
+
+  Gives the IC money and commodities specified in <commodities> to <object>.
+  <object> must be near you, and you must pass it's EGIVE @lock.
+
+  When you successfully give commodities to an object, you'll see it's
+  EGIVE attribute. Others in your location will see it's OEGIVE attribute, and
+  it's AEGIVE attribute will be @triggered. If you fail to give to the object,
+  it's EGIVEFAIL, OEGIVEFAIL and AEGIVEFAIL attributes are used instead.
+
+  See also: ECON COMMODITIES, ECON LOCKS, ECON ATTRS, +DONATE
+
+& +TAKE
+
+  +TAKE <object>=<commodities>
+
+  Take the IC money and commodities specified in <commodities> from <object>.
+  <object> must be near you, and you must either be it's owner, or pass it's
+  ETAKE @lock, if set.
+
+  If you successfully take from the object, you'll see it's ETAKE attribute.
+  Others in your location will see it's OETAKE attr, and it's AETAKE attr will
+  be triggered. If you fail to take from it, the ETAKEFAIL, OETAKEFAIL and
+  AETAKEFAIL attrs are used instead.
+
+& +COMMODITIES
+
+  +COMMODITIES [<currency>]
+
+  If no <currency> is given, this command shows the list of available commoditie
+  on the game, in the order they appear in a list of <ints> (currency names are
+  shown for money). If a <currency> is given, the available denominations for
+  that currency are shown instead.
+
+& +DONATE
+
+  +DONATE <object>=<commodities>
+
+  This wizard-only command adds <commodities> to the wallet of <object>.
+  The commodities are not taken from the user's wallet, as they are with the
+  +give command - they are created and added. It can be used to add new
+  resources to the game.
+
+  Example:
+   @aconnect config(player_start)=@break [hasattr(%#,MONEY)] ;
+           @pemit %#=Welcome to [mudname()]! ; +donate %#=25 dollars
+
+  See also: +give, ECON
+
+& ECON()
+
+  econ(view[,<object>[,<raw?>]])
+       Returns the commodities <object> has, or the caller if no <object> is
+       given. If <raw?> is true, the returned value is a list of ints instead
+       of the word representation of the commodities.
+  econ(valid,<values>[,<type>])
+       Returns 1 if <values> is a valid commodity list or list of ints,
+       depending on the <type>. <type> should be one of "words" or "ints",
+       and defaults to "words".
+  econ(convert,<values>[,<from>])
+       Convert <values> from a list of ints to a list of words, or vice versa.
+       <from> is the type to convert from, and defaults to "words".
+  econ(add,<commodities1>,<commodities2>)
+       Add the commodities in <commodities1> to those in <commodities2>.
+  econ(sub,<commodities1>,<commodities2>)
+       Subtract the commodities in <commodities2> from <commodities1>.
+  econ(afford,<commodities1>,<commodities2>)
+       Are there enough commodities in <commodities1> to pay <commodoties2>?
+
+  Continued in HELP ECON2
+
+& ECON2
+
+  econ(equal,<ints1>,<ints2>[,<size>])
+       Are the first <size> elements of <ints1> and <ints2> equal? If no
+       <size> is given, all elements are checked. The lists of ints don't
+       need to be of equal size - "5" and "5|0|0" are equal (though "5" and
+       "5|3|0" are not).
+  econ(pad,<ints>)
+       Pad a list of ints with 0's to make it the full length of a list
+       of ints.
+  econ(adjust,<object>,<ints>,<give?>)
+       Adjust <object>'s wallet by <ints>. If <give?> is true, <ints> are
+       added to the objects wallet, otherwise they're taken away. Wiz-only.
+  econ(commodities[,<currency>[,<plural?>]])
+       If no <currency> is given, returns a |-delimited list of the names of
+       all commodities available on the game (excluding money). If
+       <currency> is given as -1, a |-delimited list of currency names is
+       returned. If <currency> is given as anything else,a |-delimited list
+       of <value> <name> pairs is returned, showing the names and values of
+       all denominations of that currency available. By default, the singular
+       names are returned; to get the plural forms, give a true value for
+       <plural?>. If an invalid <currency> is given, #-1 is returned.
+
+& ECON COMMODITIES
+
+  In the econ help files, <commodities> refers to a comma-separated list of
+  commodities, in the format:
+    <number> <name>, <number> <name>
+
+  <ints> refers to a |-separated list of ints representing each commodity.
+
+  <values> can be either a commodity list or a list of ints, depending on
+  the context when it's used.
+
+  To see the available commodity names, and the order they appear in a list
+  of ints, use the +COMMODITIES command.
+
+& ECON LOCKS
+
+  The following locks are used by the econ system:
+    EGIVE - who can +give things to you. If it's not set, anyone can give
+            you commodities.
+    ETAKE - who can +take from you. Anyone passing this lock can take
+            from you, if it's set.
+    EVIEW - who can view your wallet with +money. If this lock isn't set,
+            only people who can examine you can check your +money.
+
+  For EGIVE and ETAKE, the amount being given or taken is available to
+  evaluation locks as a list of <ints> as %0. (For more info on evaluation
+  locks, and other forms of @lock, see HELP @LOCK.)
+
+  Some examples can be found in HELP ECON LOCKS2
+
+& ECON LOCKS2
+
+  Examples:
+  > @lock/user:eview me=$me
+  (let any objects owned by the same person as me check my money)
+
+  > @lock/user:egive me=!species:dwarf
+  (don't accept gifts from dwarves)
+
+  > @lock/user:etake me=$me|flag^banker
+  (any objects with the same owner as me, or objects with the "banker" 
+   flag set can take from me)
+
+  > &enough me=econ(equals,%0,v(required_amount))
+  > @lock/user:egive me=enough/1
+  (make sure the amount being given is exactly equal to the <int> list
+   stored in the required_amount attribute)
+
+& ECON ATTRIBUTES
+& ECON ATTRS
+
+  The following attributes are used by the econ system (see 'help @<attr>'):
+  EGIVE     OEGIVE     AEGIVE     EGIVEFAIL     OEGIVEFAIL     AEGIVEFAIL
+  ETAKE     OETAKE     AETAKE     ETAKEFAIL     OETAKEFAIL     AETAKEFAIL
+
+  The MONEY attribute is also used to store your wallet. It cannot be changed
+  by players, and may not be visible (use +money or econ() to check your
+  wallet).
+
+& @EGIVE
+& @OEGIVE
+& @AEGIVE
+
+  @egive <object>[=<message>]
+  @oegive <object>[=<message>]
+  @aegive <object>[=<action list>]
+
+  The EGIVE attribute is shown to an an object whenever it successfully
+  +give's commodities to <object>. The OEGIVE attribute is shown to others in
+  <object>'s location when someone successfully +give's to it. The AEGIVE
+  attribute is triggered when <object> is given commodities.
+
+  In all of these attributes, %0 is a |-separated list of <ints> representing
+  the amount being given, and %1 is a list of <commodities> (English words).
+
+  Example:
+   @egive Bank Clerk=You give the clerk %1.
+   @oegive Bank Clerk=gives some items to the clerk.
+   @aegive Bank Clerk=@set me=account`%#:[econ(add,default(me/account`%#,0),%0)]
+
+  See also: ECON, ECON ATTRIBUTES, ECON COMMODITIES, econ()
+
+& @EGIVEFAIL
+& @OEGIVEFAIL
+& @AEGIVEFAIL
+
+  @egivefail <object>[=<message>]
+  @oegivefail <object>[=<message>]
+  @aegivefail <object>[=<action list>]
+
+  The EGIVEFAIL message is shown to an object when it fails to +give
+  commodities to <object>. OEGIVEFAIL is shown to others in the same room
+  as <object>, and the AEGIVEFAIL attribute is triggered.
+
+  In all of these attributes, %0 is a |-separated list of <ints> representing
+  the amount being given, %1 is a list of <commodities> (English words), and
+  %2 is the dbref of the receiving object.
+
+  Example:
+    @egivefail Merchant=%1 is the wrong amount. What you're trying to buy
+                        costs [econ(convert,v(price),ints)].
+    @oegivefail Merchant=hands the merchant some coins, but he shakes his
+                         head and gives them back.
+    @aegivefail Merchant=@wait 1=say If you still want to buy that, %n,
+                         type +GIVE MERCHANT=[econ(convert,v(price),ints)]
+
+  See also: ECON, ECON ATTRIBUTES, ECON COMMODITIES, econ()
+
+& @ETAKE
+& @OETAKE
+& @AETAKE
+
+  @etake <object>[=<message>]
+  @oetake <object>[=<message>]
+  @aetake <object>[=<action list>]
+
+  Sets the message shown to a person (ETAKE), the message shown to others in
+  the room (OETAKE), and the action list to be triggered (AETAKE) when
+  someone successfully +takes commodities from <object>. In all of these
+  attributes, %0 is a |-separated list of <ints> representing the amount
+  taken, and %1 is a list of <commodities> (English words).
+
+  Example:
+    @etake Bank Teller=You take %1 from your vault.
+    @oetake Bank Teller=takes a small bag from the teller.
+    @aetake Bank Teller=@set me=account`%#:[econ(sub,v(account`%#),%0)]
+
+    @lock/user:etake Bank Teller=fun.canafford/1
+    &fun.canafford Bank Teller=econ(afford,default(me/account`%#,0),
+
+  See also: ECON, ECON ATTRIBUTES, ECON COMMODITIES, econ()
+
+& @ETAKEFAIL
+& @OETAKEFAIL
+& @AETAKEFAIL
+
+  @etakefail <object>[=<message>]
+  @oetakefail <object>[=<message>]
+  @aetakefail <object>[=<action list>]
+
+  Sets the message shown to someone (ETAKEFAIL), the message shown to others
+  in the room (OETAKEFAIL) and the action list to be triggered (AETAKEFAIL)
+  when someone tries to +take from <object> but fails.  In all of these
+  attributes, %0 is a |-separated list of <ints> representing the amount
+  taken, and %1 is a list of <commodities> (English words).
+
+  Example:
+    @etakefail Bank Teller=You don't have that much in your account.
+    @oetakefail Bank Teller=speaks to the teller, who shakes his head.
+    @aetakefail Bank Teller=@wait 2=POSE locks %n's vault and hands %o back
+                            %p key.
+
+  See also: ECON, ECON ATTRIBUTES, ECON COMMODITIES, econ()
+
+& @MONEY
+
+  The MONEY attribute stores the commodities an object currently has. It
+  cannot be altered directly - use the +GIVE, +TAKE and +DONATE commands, or
+  the ECON() function, for moving commodities around.
+
+  See also: ECON, ECON ATTRIBUTES, ECON COMMODITIES, econ()
+
+& ECON EXAMPLES
+
+  The following pieces of example code are currently available:
+
+  NAME       DESCRIPTION
+  ---------- ----------------------------------------------------------------
+  Vendor     A basic multi-item vendor.
+  Banker     A simple banker you can store money and commodities with.
+  Convertor  A bureau-de-change, for converting money from one currency
+             to another.
+
+  Type HELP ECON <name> to see the code.
+
+  To use it, just remove the leading spaces and newlines from the heavily
+  indented lines, and paste into the MUSH. For example,
+  @pemit %#=This is 
+       a test.
+  would become
+  @pemit %#=This is a test.
+
+& ECON BANKER
+
+  Example code for a banker that allows players to leave commodities with him:
+
+  @create Banker
+  @desc Banker=A banker. To see how much is in your account, type CHECK 
+       ACCOUNT. To withdraw, just +TAKE from the banker. To make a deposit, 
+       +GIVE to him.
+  &who Banker=edit(%0,:,_)
+
+  &cmd.check Banker=$check account: @assert hasattr(me,acc`[u(who,%:)])=
+       @pemit  %#=The Banker says, "You don't have an account here, %n." ; 
+       @oemit %#=The Banker writes something on a slip of paper, and passes 
+       it to %n. ; @pemit %#=The banker slides you a piece of paper. Written 
+       on it is: [econ(convert,v(acc`[u(who,%:)]),ints)]
+  @egive Banker=You deposit %1.
+  @oegive Banker=hands something to the banker, who locks it safely in
+       the vault.
+
+  @etake Banker=You withdraw %1.
+  @oetake Banker=whispers something to the banker, who fetches %n a package 
+       from the vault.
+  @etakefail Banker=The Banker shakes his head. "You don't have that much in 
+       your account, %n."
+
+  Contined in HELP ECON BANKER2
+
+& ECON BANKER2
+
+  @lock/user:etake Banker=check_account/1
+  &check_account Banker=econ(afford,default(me/acc`[u(who,%:)],0),%0)
+  @aetake Banker=&acc`[u(who,%:)] me=[econ(sub,v(acc`[u(who,%:)]),%0)]
+  @aegive Banker=&acc`[u(who,%:)] me=[econ(add,default(me/acc`[u(who,%:)],0),
+       %0)]
+
+& ECON VENDOR
+
+  Example code for a multi-item vendor (a bartender, in this case):
+
+  @create Vendor
+  @desc Vendor=A vendor. Type MENU to see the menu.
+  &check_amount Vendor=econ(equal,elements(v(prices),v(last_order),^),%0)
+  @lock/user:egive Vendor=check_amount/1
+  &products Vendor=Beer^Vodka^Whiskey^Tequila^Red Wine^White Wine
+  &prices Vendor=250^225^220^240^215^215
+  &order Vendor=$order *: @assert setr(0,match(v(products),%0,^))=@pemit 
+      %#=What do you want to buy? Check the MENU to see what we sell ;
+      @emit %n orders [elements(v(products),%q0,^)]. [name(me)] says, 
+      "That'll be [econ(convert,elements(v(prices),%q0,^),ints)], please." ;
+      &last_order me=%q0
+  &menu_sub Vendor=repeat(=,78)%rWe sell these items:%r[setq(0,v(prices))]
+      [iter(v(products),ljust(%i0,30)[econ(convert,elements(%q0,#@,^),ints)]
+      ,^,%r)]%r[repeat(=,78)]
+  &menu Vendor=$menu: @pemit/silent %#=u(menu_sub)
+  @egive Vendor=name(me) smiles, and hands you your [elements(v(products),
+      v(last_order),^)]. "Thanks, %n."
+  @oegive Vendor=hands some coins to [name(me)], who gives %n %p [elements(
+      v(products),v(last_order),^)].
+
+  See HELP ECON VENDOR2 for some improvements.
+
+& ECON VENDOR2
+
+  One way the vendor could be improved is to allow it to give change. In
+  order to do this, you need to alter the lock so the vendor will accept
+  any amount higher than the price:
+
+  &check_amount Vendor=econ(afford,%0,elements(v(prices),v(last_order),^))
+
+  You also need to set an @aegive, to give the change back:
+
+  @aegive Vendor=@break econ(equal,%0,setr(0,elements(v(prices),
+      v(last_order),^))) ; say Don't forget your change, %n. ; 
+      +give/raw %n=[econ(sub,%0,%q0)]
+
+  You could also set extra messages, like an @egivefail that reminds the
+  player how much the product costs:
+
+  @egivefail Vendor=name(me) says, "That's not enough, %n. The [elements(
+      v(products),v(last_order),^)] costs [econ(convert,elements(v(prices),
+      v(last_order),^),ints)]."
+  @oegivefail Vendor=name(me) looks at the coins %n holds out, and shakes 
+      [poss(me)] head. "That's not enough, %n."
+
+& ECON CONVERTOR
+
+  Example code for a bureau-de-change, for converting money from one currency
+  into another. It could be improved to accept multiple currencies at once.
+
+  @create Bureau-de-Change (bdc)
+  @desc bdc=Type CHANGE TO <currency> (where <currency> is one of 
+        [itemize(u(all_curr),|,or)]) to select which currency you wish to 
+        convert money to, then +GIVE BDC=<money>. You can only convert from 
+        one currency at a time.[switch(u(fun.commission),0,,%b\(Note: We 
+        charge a #$%% commission on all conversions!\))]
+  @@ This is a percentage
+  &commission bdc=2
+  &fun.commission bdc=switch(bound(v(commission),0,99),#-*,0,#$)
+  &all_curr bdc=econ(commodities,-1)
+  &base_denom bdc=localize(setq(0,elements(u(all_curr),v(curr),|))[if(%0,
+        %q0%b)][rest(grab(econ(commodities,%q0),1 *,|))])
+  &curr bdc=1
+  &exchange bdc=0
+  &cmd.change bdc=$change to *: @assert setr(0,match(u(all_curr),%0,|))=
+        @pemit %#=I'm not sure which currency you mean. Choose one of 
+        [itemize(u(all_curr),|,or)]. ; @pemit %#=+GIVE BDC=<money>, and it'll 
+        be converted to [elements(u(all_curr),%q0,|)] for you. ; &curr me=%q0
+  @lock/user:egive bdc=valid_amount/1
+  &give_error`1 bdc=You can only give one currency at a time, and it can't be 
+        [elements(u(all_curr),v(curr),|)].
+  &give_error`2 bdc=You can only change money for another currency, you can't
+         trade commodities.
+  &give_error`3 bdc=I don't know the conversion rate for those currencies. 
+        Sorry.
+  &give_error`4 bdc=That's less than one [u(base_denom,1)]. You'll have to 
+        give me more.
+  &give_error`5 bdc=I'm afraid I don't have that much [u(base_denom)] at the 
+        moment. Sorry!
+
+  &valid_amount bdc=switch(null(iter(setq(0,0,9,0)%0,switch(0,##,,setq(0,#@,9,
+        add(%q9,1))),|))0,eq(%q9,1),set(me,give_error:1)0,comp(%q0,v(curr)),
+        set(me,give_error:1)0,lte(%q0,words(u(all_curr),|)),set(me,
+        give_error:2)0,hasattr(me,exchange`[setr(1,elements(u(all_curr),%q0
+        ,|))]`[setr(2,elements(u(all_curr),v(curr),|))]),set(me,give_error:3)0
+        ,set(me,exchange:[ulocal(fun.exchange,elements(%0,%q0,|),%q0,%q1,
+        v(curr),%q2)])[bound(v(exchange),0,1)],set(me,give_error:4),gte(
+        elements(econ(view,%!,1),v(curr),|),v(exchange)),set(me,
+        give_error:5)0,1)
+  @lock/user:egive bdc=valid_amount/1
+  @egivefail bdc=udefault(me/give_error`[v(give_error)],Sorry\, I can't do 
+        that conversion right now.)
+  @egive bdc=Here's your [elements(u(all_curr),v(curr),|)], %n!
+  @aegive bdc=+give/raw %#=[repeat(0|,sub(v(curr),1))][v(exchange)]
+
+  &fun.exchange bdc=@@(First, remove commission, if applicable)[switch(ufun(
+        fun.commission),0,setq(0,%0),setq(0,sub(%0,ceil(mul(fdiv(%0,100),
+        #$)))))][@@(Now convert what's left between currencies)]
+        [floor(fdiv(%q0,v(exchange`%2`%4)))]
+
+  @@ Change these to use the appropriate exchange rates for your currencies
+  @@ When you give 1 <curr1>, you get <x> <curr2> back
+  @@ &exchange`<curr1>`<curr2> bdc=<x>
+  &exchange`gbp`usd bdc=1.9893
+  &exchange`usd`gbp bdc=0.5027
+
+& ECON CHANGES
+& ECON VERSION
+& ECON 2.2g
+
+  Version 2.2g - August 20th 2008
+
+  * The EGIVE lock was not being checked correctly. Reported
+    by Sexy Neko Hibiki.
+  * +give/raw and +take/raw were broken by the @hooks on those commands.
+    Reported by Sexy Neko Hibiki.
+
+& ECON 2.2f
+
+  Version 2.2f - May 28th 2008
+
+  +Commodities was @hook'd to the wrong object.
+
+& ECON 2.2e
+
+  Version 2.2e - April 25th 2008
+
+  * The function for converting a list of words to a list of ints behaved
+    incorrectly when there were currencies but not commodities added.
+    Fixed after report from Matthew Stockfleth.
+
+& ECON 2.2d
+
+  Version 2.2d - April 21st 2008
+
+  * Typo in the econ() @function at startup fixed by Matthew Stockfleth.
+
+& ECON 2.2c
+
+  Version 2.2c - July 7th 2007
+
+  * Ported to the MUSHcode Suite.
+  * New +TMCS/ECON command that allows the addition and removal of
+    currencies and commodities on-the-fly.
+  * Small typo in the startup for the econ system. Reported by
+    Matthew Stockfleth.
+
+& ECON 2.1
+
+  Version 2.1 - June 13th 2007
+
+  * econ(adjust,...) worked in reverse (giving when it should take, and vice
+    versa). Fixed now.
+
+& ECON 2.0
+
+  Version 2.0 - June 9th 2007
+
+  * Added support for multiple currencies. +COMMODITIES and
+    econ(COMMODITIES,..) updated as a part of this.
+  * New +GIVE/RAW and +TAKE/RAW commands that use lists of ints instead
+    of lists of words. Useful for coding bots and NPCs that use econ.
+  * Fixed a bug (missing brackets) in +GIVE.
+  * The words arg (%1) wasn't always correctly passed to @e*fail attrs.
+  
+
+& ECON 1.0
+
+  Version 1.0 - June 6th 2007
+
+  * First public release.
+  * Added Vendor and Banker example code to help-files
+  * Made amount given/taken available as %0 to @locks
+  * Fixed +take lock checking
+  * Added @attribute'ing of *take* attributes
+  * Added 'equal' and 'commodities' subfunctions to econ()
+
+& &78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+
+
+

@@ -1,0 +1,54 @@
+& TMCS WARDROBE
+& WARDROBE
+& DESC CHANGER
+& +WARDROBE
+& +WWHICH
+& +WSAVE
+& +WREPLACE
+& +WSTORE
+& +WERASE
+& +WEXAM
+& +WEVAL
+& +WWEAR
+
+  The Wardrobe system can be used to store many different descriptions. You
+  can then switch between them easily, or even wear more than one description
+  at a time. Your puppets and other objects can also access your descriptions.
+
+  Commands:
+  +WARDROBE                      List all your saved descriptions
+  +WWHICH                        See which descs you're currently wearing
+  +WSAVE <name>                  Save your current description as <name>
+  +WREPLACE <name>               Replace desc <name> with your current desc
+  +WSTORE[/noeval] <name>=<text> Save <text> as description <name>
+  +WERASE <name>                 Delete the given description.
+  +WEXAM <name>                  View <name>, exactly as it's stored
+  +WEVAL <name>                  View <name> as it will look when evalauted
+  +WWEAR <name1> [...<nameN>]    Wear the given descriptions
+
+  See HELP WARDROBE2 for admin commands.
+
+& WARDROBE2
+
+  +WARDROBE/TABLE [<table>]
+
+  If <table> is given, this command sets the name of the MySQL table used for
+  storing the descriptions in the wardrobe system. If a table already exists
+  with descriptions in, it's renamed to <table>; if not, a new table is
+  created. <table> must be between 1 and 50 characters long, and can only
+  contain letters, numbers, underscores and hyphens.
+
+  If no <table> is given, the name of the current table is shown.
+
+  Only wizards can use this command.
+
+& WARDROBE CHANGES
+
+  v1.4b - Apr 25 2008 - Bug in +wardrobe/table fixed by Matthew Stockfleth.
+  v1.4  - Sep 07 2007 - Typo in +wardrobe fixed by Balerion.
+  v1.3  - Aug 03 2007 - New +wardrobe/table command. Typo fixed by Balerion.
+  v1.2b - Jul 23 2007 - Updated for new version of Core
+  v1.2  - Jul 02 2007 - Converted to TMCS
+  v1.1  - Jun 22 2007 - +wstore's <text> couldn't contain newlines.
+  v1.0  - Jun 06 2007 - Initial Release
+

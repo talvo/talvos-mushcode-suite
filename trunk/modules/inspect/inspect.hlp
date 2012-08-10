@@ -1,0 +1,84 @@
+& TMCS INSPECT
+& INSPECT
+& VIEWS
+
+  +Inspect (views) code allows extra details to be placed on rooms without
+  cluttering the room's description or creating lots of otherwise blank
+  objects.
+
+  See HELP +INSPECT for info on how to use the system.
+  See HELP +INSPECT CODING for how to add +inspects to your rooms and objects.
+
+& +INSPECT
+
+  +INSPECT/LIST [<object>]
+  +INSPECT [<object>/]<detail>
+
+  The first form of this command lists all the visible details on <object>,
+  or on your current location if no <object> is given.
+
+  The second form of this command lets you look at a given <detail> on an
+  <object>, or on your current location if no <object> is given.
+
+  See also: +INSPECT CODING
+
+& +INSPECT CODING
+
+  Adding inspectable details to rooms and other objects is fairly simple.
+  To add a new detail, set an attribute named INSPECT`<detail> on your object
+  with the description of the detail in it. For example:
+    &inspect`mirror here=An old mirror with an ornate gold
+              frame hangs on the wall.
+
+  If you want to make the detail hidden (so that it doesn't appear on
+  +inspect/list), prefix the detail name with an exclaimation mark (!).
+  These are useful for quests, hidden passageways, etc. For example:
+    &inspect`!tapestry here=A colourful tapestry hangs on the south wall.
+              One corner is not fixed down; you could probably 'lift' it up.
+
+  In all attributes used by the +inspect system, %0 is the name of the detail
+  being inspected, exactly as it was typed by the +inspector.
+
+  Continued in HELP +INSPECT CODING2
+
+& +INSPECT CODING2
+
+  When someone +inspects a detail, others in the room see a generic message.
+  If you want to set your own message, you can do so with:
+    &oinspect <object>=<message>
+  For example:
+    @dig/teleport Museum
+    &oinspect here=looks at the [lcstr(%0)] exhibit.
+
+  To set a more specific message for a certain detail, set an
+  OINSPECT`<detail> attribute. For example:
+    &oinspect`tapestry here=looks at the tapestry on the south wall.
+
+  Do not prefix the <detail> name with an ! when setting OINSPECT
+  attributes for hidden details. Setting the OINSPECT attribute to an
+  empty value will supress the default message - this happens automatically
+  when you set an OINSPECT`<detail> attribute, so make sure you set a default
+  message as well, if you still want one.
+
+  Continued in HELP +INSPECT CODING3
+
+& +INSPECT CODING3
+
+  You can also set an action list to be triggered whenever a detail is
+  inspected. Use the AINSPECT attribute to have the action list triggered
+  for all details, or an AINSPECT`<detail> attribute to run an action for
+  only a specific detail. For example:
+    &ainspect Market Stall=@wait 2=SAY Want to buy some %0, %n?
+    &ainspect`apples Market Stall=@wait 2=SAY If you buy two apples, %n,
+                           you'll get a third one free!
+
+  Example:
+   &inspect`desk here=A small desk sits in the corner of the room. The corner
+                      of a sheet of paper sticks out the edge of the drawer.
+   &inspect`!paper here=Written on the paper in small, tidy letters are the
+                      words "Vault 16. Combination 1-5-3-6"
+   &oinspect`paper here=glances at something in the desk drawer.
+   &ainspect`paper here=&finders me=setunion(v(finders),%:)
+
+& 78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

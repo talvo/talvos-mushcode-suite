@@ -1,0 +1,14 @@
+& TMCS TOP
+& +TOP
+
+  +TOP[/totals] [<count|player>]
+
+  This command lists the most active players on the game. By default it shows
+  10, but you can specify a <count> between 1 and 25 to show a different
+  amount. You can also give a <player> to see only that player's +top.
+
+  Normally, only activity this month is shown. If the /totals switch is
+  given, overall activity since the game started is shown.
+
+& 78
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

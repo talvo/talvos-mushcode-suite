@@ -1,0 +1,163 @@
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@ Core Object Creation for Talvo's MUSHcode Suite
+@@ This should run from a fresh Wizard player with the NO_PAY @power
+@@ The VA-VZ attributes on the player will be altered during
+@@ installation; they should not be changed or removed afterwards.
+@@ Use the same character to install all packages from the Suite.
+@@
+@@ Written by Mike Griffiths (talvo@talvo.com), latest version and extra
+@@ packages for the suite available from www.talvo.com
+@@ Tested on PennMUSH 1.8.3p3
+@@
+@@ You do not need to make any changes to this file. Just /quote, or
+@@ copy and paste the entire contents into your MUSH.
+
+
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@ Wizard Objects
+@set me=VA:[create(TMCS - General Wizard Command Object)]
+@set me=VB:[create(TMCS - General Wizard Function Object)]
+
+@set %va=WIZARD !NO_COMMAND LOUD
+@set %vb=WIZARD NO_COMMAND LOUD
+@power %va=no_pay
+@power %vb=no_pay
+
+@link %va=[config(master_room)]
+@link %vb=%va
+
+@describe %va=This is the Wizard Command Object for Talvo's MUSHcode Suite. It belongs in the Master Room. All commands requiring Wizard privs go on here. Attributes are named in the format <package>`CMD.<cmd>
+
+@describe %vb=This is the Wizard Function Object for Talvo's MUSHcode Suite. It contains code stubs for commands requiring Wizard privs, as well as ufuns/@functions requiring Wizard privs. It should not be in the Master Room. Attributes are named in the format <package>`FUN.<fun>
+
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@ Powered Objects
+@set me=VD:[create(TMCS - General Powered Command Object)]
+@set me=VE:[create(TMCS - General Powered Function Object)]
+
+@set %vd=!NO_COMMAND LOUD
+@set %ve=NO_COMMAND LOUD
+@power %vd=can_nspemit pemit_all see_all poll search no_pay
+@power %ve=[powers(%vd)]
+
+@link %vd=[config(master_room)]
+@link %ve=%vd
+
+@describe %vd=This is the General Powered Command Object for Talvo's MUSHcode Suite. Commands which don't require Wizard privs go on here. It belongs in the Master Room. Attributes are named <package>`CMD.<cmd>[ufun(%vb/describe`sub)]
+
+@describe %ve=This is the General Powered Function Object for Talvo's MUSHcode Suite. It contains command stubs for commands that don't need Wizard privs, along with ufuns/@functions which don't need Wiz privs. It should not be in the Master Room. Attrs are named <package>`FUN.<fun>
+
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@ Other Objects
+
+@set me=VC:[create(TMCS - Core)]
+@set me=VS:[create(TMCS - Startup Object)]
+@set me=VI:[create(TMCS - Info \(DB\) Object)]
+
+@set %vc=NO_COMMAND
+@set %vs=NO_COMMAND
+@set %vi=NO_COMMAND
+
+@power %vi=MANY_ATTRIBS
+
+@link %vc=%va
+@link %vs=%va
+@link %vi=%va
+
+@describe %vc=This object holds information about the installation of Talvo's MUSHcode Suite. It should not be in the Master Room. Attributes are in this format:%rINFO`<package> - the package's full name%rINFO`<package>`VERSION - package version%rINFO`<package>`DESC - a basic description of the package%rINFO`<package>`OBJECTS - a list of all objects created by the package%rINFO`<package>`INSTALLED - the secs() when the package was installed%rINFO`<package>`TAG - (optional) tag prefix for command output%r[ufun(info)]
+
+@set %vc/describe=no_inherit
+
+@describe %vs=This object contains information on all the commands needed to be run at startup to initialize Talvo's MUSHcode Suite. Attributes are in this format:%r&<package>`MISC`<name> %!=<action list> to run the commands in <action list>. NOTE: Do NOT use @break%r&<package>`CMD`<cmd> %!=<switches>|<args> for @COMMAND/ADD<switches> <cmd> ; @HOOK/OVERRIDE <cmd>=<args>%r&<package>`FUN`<function> %!=<args> for @FUNCTION <function>=<args>%r&<package>`FUNP`<function> %!=<args> for @FUNCTION/PRESERVE <function>=<args>%r&<package>`ATTR`<attr> %!=<args> for @ATTRIBUTE/ACCESS <attr>=<args>%r&<package>`HOOK`<cmd>/<switch> %!=<args> for @HOOK/<switch> <cmd>=<args> (for non-/override hooks)%r&<package>`TRG`<name> %!=<obj>/<attr> for @TRIGGER <obj>/<attr>
+
+@describe %vi=This object is used as a general database object for Suite packages. All attr names are prefixed with <package>` but there is otherwise no specific structure to their naming - each package does as it needs.
+
+@lock/control %vi=$me
+
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@ Core Installation
+
+&info %vc=%rTalvo's MUSHcode Suite was written by Mike Griffiths (talvo@talvo.com). The latest version of the code is available from www.talvo.com%rInstalled Components of the Suite:%r[iter(lattr(%vc/info`*),ansi(h,get(%vc/%i0)) v[get(%vc/%i0`version)] ([rest(%i0,`)]): [get(%vc/%i0`desc)] ([switch(get(%vc/%i0`objects),,0 objects,* *,words(#$) objects - #$,1 object - #$)]),,%r)]%r
+
+@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@ Core ufuns
+&tag %ve=udefault(%vc/info`%0`tag,)
+&haspackage %ve=cand(hasattrval(%vc,info`%0),not(strmatch(%0,*`*)))
+&packages %ve=squish(edit(%b[lattr(%vc/info`*)],%bINFO`,%b))
+
+&header %ve=center(switch(%0,,,%b[ansi(yh,%0)]%b),firstof(%1,78),ansi(gh,=))
+&footer %ve=switch(%0,,ansi(gh,repeat(=,firstof(%1,78))),ansi(gh,repeat(=,lmath(sub,firstof(%1,78) [strlen(%0)] 4 2))) [ansi(yh,%0)] [ansi(gh,repeat(=,4))])
+&divider %ve=ansi(gh,repeat(-,firstof(%0,78)))
+
+@@ @@@@@@@@@@
+@@ +TMCS/DELETE - delete a package, and all code/objects associated with it.
+&core`cmd.delete-package %va=$+tmcs/delete *: @nspemit/silent %#=setr(9,ufun(%ve/tag,core))[setq(0,0)][switch(0,strmatch(%#,#1),You must be God to do that.,hasflag(%#,wizard),You must be a Wizard to do that.,not(strmatch(%0,*`*)),There is no package with that name.,ufun(%ve/haspackage,%0),There is no package with that name.,if(strmatch(%0,core),lt(words(ufun(%ve/packages)),2),1),You cannot delete the Core while other packages are installed.,Removing package [setr(n,get(%vc/info`%0))] ([ucstr(%0)])...[setq(0,1,t,get(%vc/info`%0`objects))])] ; @assert %q0 ; @dolist [remove(get(%vc/info`core`objects),%vc)]={@nspemit/silent %#=Wiping package attributes from [name(##)](##)... ; @wipe ##/%0`**} ; @nspemit/silent %#=%q9Removing package info from Core object... ; @wipe %vc/info`%0 ; @dolist %qt={@set ##=no_command ; @nuke ## ; @nspemit/silent %#=%q9Destroying Object [name(##)](##)...} ; @force me=@nspemit/silent %#=\%q9Package deleted.
+
+@@ @@@@@@@@@@
+@@ +TMCS/ADDPACKAGE <name>=<fullname>/<version>/<desc>/<tag> - add a new package, or update an old one
+&core`cmd.add-package %va=$+tmcs/addpackage *=*: @nspemit/silent %#=ufun(%ve/tag,core)[switch(0,hasflag(%#,Wizard),Permission denied.,regmatch(%0,^\[a-zA-Z0-9_.-\]\{1\,25\}),That is not a valid package name.,strmatch(%1,*/*/*/*,f v d t),You must give a fullname\, version\, description and tag.,if(ufun(%ve/haspackage,%0),Updating package %0...,Adding package %0 (%qf)\, version %qv...)[attrib_set(%vc/info`%0,%qf)][attrib_set(%vc/info`%0`version,%qv)][attrib_set(%vc/info`%0`desc,%qd)][if(strlen(%qt),attrib_set(%vc/info`%0`tag,decompose(%qt)),attrib_set(%vc/info`%0`tag))][attrib_set(%vc/info`%0`installed,secs())][attrib_set(%vc/info`%0`installed`[secs()],%: / +TMCS/ADDPACKAGE %0=%1)] Done.)]
+
+@@ @@@@@@@@@@
+@@ +TMCS/REGISTER <name>=<object>
+&core`cmd.register-object %va=$+tmcs/register *=*: @nspemit/silent %#=ufun(%ve/tag,core)[switch(0,hasflag(%#,Wizard),Permission denied.,ufun(%ve/haspackage,%0),No such package.,cand(isdbref(%1),num(%1)),Invalid dbref/objid.,not(member(get(%vc/info`%0`objects),objid(%1))),That object is already registered for that package.,Object registered.[attrib_set(%vc/info`%0`objects,squish(get(%vc/info`%0`objects) [objid(%1)]))])]
+
+@@ u(%vb/core`fun.register-object,<package>,<dbref>)
+&core`fun.register-object %vb=switch(0,hasflag(%@,WIZARD),#-1 PERMISSION DENIED.,ufun(%ve/haspackage,%0),#-1 NO SUCH PACKAGE,cand(isdbref(%1),num(%1)),#-1 NO SUCH OBJECT,if(not(member(get(%vc/info`%0`objects),objid(%1))),attrib_set(%vc/info`%0`objects,squish(get(%vc/info`%0`objects) [objid(%1)])))1)
+
+@@ @@@@@@@@@@
+@@ +TMCS/UNREGISTER <name>=<object>
+&core`cmd.unregister-object %va=$+tmcs/unregister *=*: @nspemit/silent %#=ufun(%ve/tag,core)[switch(0,hasflag(%#,Wizard),Permission denied.,ufun(%ve/haspackage,%0),No such package.,cor(member(get(%vc/info`%0`objects),setr(1,%1)),member(get(%vc/info`%0`objects),setr(1,objid(%1)))),That object is not registered for that package.,Object unregistered.[attrib_set(%vc/info`%0`objects,squish(remove(get(%vc/info`%0`objects),%q1)))])]
+
+@@ u(%vb/core`fun.unregister-object,<package>,<dbref>)
+&core`fun.unregister-object %vb=switch(0,hasflag(%@,WIZARD),#-1 PERMISSION DENIED,ufun(%ve/haspackage,%0),#-1 NO SUCH PACKAGE,localize(if(cor(member(get(%vc/info`%0`objects),setr(1,%1)),member(get(%vc/info`%0`objects),setr(1,objid(%1)))),attrib_set(%vc/info`%0`objects,squish(remove(get(%vc/info`%0`objects),%q1)))))1)
+
+@@ @@@@@@@@@@
+@@ +TMCS - list all packages
+&core`cmd.list-packages %vd=$+tmcs: @nspemit/silent %#=ufun(%ve/tag,core)The following packages are installed:%r[ufun(%ve/core`fun.list-packages-line,ansi(h,Package),ansi(h,Ver),ansi(h,Full Name))]%r[ufun(%ve/core`fun.list-packages-line,ufun(%ve/divider,10),ufun(%ve/divider,5),ufun(%ve/divider,61))]%r[iter(sortkey(#lambda/get(%vc/info`%%0`installed),ufun(%ve/packages)),ufun(%ve/core`fun.list-packages-line,%i0,get(%vc/info`%i0`version),get(%vc/info`%i0)),,%r)]%r
+
+&core`fun.list-packages-line %ve=align(10 5 61,left(%0,10),left(%1,5),left(%2,61))
+
+@@ @@@@@@@@@@
+@@ +TMCS <package> - show info on a package
+&core`cmd.package-info %vd=$+tmcs *: @nspemit/silent %#=ufun(%ve/tag,core)[switch(0,ufun(%ve/haspackage,%0),No such package.,Installation Information for Package: [ucstr(%0)]%r%b%bPackage Name: [get(%vc/info`%0)]%r%b%bPackage Version: [get(%vc/info`%0`version)]%r%b%bPackage Description: [get(%vc/info`%0`desc)]%r%b%bInstalled On: [timefmt($b $d $Y,get(%vc/info`%0`installed))][if(orflags(%#,Wr),%r%b%bObjects Used: [if(strlen(squish(get(%vc/info`%0`objects))),iter(sort(get(%vc/info`%0`objects)),name(##)\([first(##,:)][flags(##)]\),,%r[space(16)]),None)]%r)])]
+
+@@ @@@@@@@@@@
+@@ +TMCS/UPDATE - update the V? and X? attrs, to show newly added objects
+&core`cmd.update %va=$+tmcs/update: @nspemit/silent %#=ufun(%ve/tag,core)[switch(0,hasflag(%#,Wizard),Permission denied.,words(setdiff(setr(0,lattr(setr(1,owner(me))/V?) [lattr(%q1/X?)]),lattr(me/V?) [lattr(me/X)])),There have been no new objects added since the last update.,Updated.[null(iter(%q0,iter(%q0,attrib_set(get(%q1/%i0)/%i1,get(%q1/%i1)))))])]
+
+@@ @@@@@@@@@@
+@aconnect %va=THINK iter(lattr(%vb/*`aconnect),ufun(%vb/%i0,%0,%1,%2,%3,%4,%5,%6,%7,%8,%9))
+@adisconnect %va=THINK iter(lattr(%vb/*`adisconnect),ufun(%vb/%i0,%0,%1,%2,%3,%4,%5,%6,%7,%8,%9))
+
+@aconnect %vd=THINK iter(lattr(%ve/*`aconnect),ufun(%ve/%i0,%0,%1,%2,%3,%4,%5,%6,%7,%8,%9))
+@adisconnect %vd=THINK iter(lattr(%ve/*`adisconnect),ufun(%ve/%i0,%0,%1,%2,%3,%4,%5,%6,%7,%8,%9))
+
+@@ @@@@@@@@@@
+@@ Startup attributes
+&core`fun`header %vs=%ve,header,1,2
+&core`fun`footer %vs=%ve,footer,1,2
+&core`fun`divider %vs=%ve,divider,1,1
+
+@@ @@@@@@@@@@
+@@ @startup command generation
+@@
+@@ Miscellaneous startup commands.
+&core`startup-trg-1 %vs=[iter(lattr(me/*`misc`*),u(%i0),,;)]
+
+@@ Commands and Functions
+&core`startup-trg-2 %vs=[iter(lattr(me/*`cmd`*),@COMMAND/ADD[first(setr(0,u(%i0)),|)] [last(%i0,`)]; @HOOK/OVERRIDE [last(%i0,`)]=[rest(%q0,|)],,;)] ; [iter(lattr(me/*`fun`*),@FUNCTION [last(%i0,`)]=[u(%i0)],,;)] ; [iter(lattr(me/*`funp`*),@FUNCTION/PRESERVE [last(%i0,`)]=[u(%i0)],,;)]
+
+@@ Hooks, Attributes and Triggers
+&core`startup-trg-3 %vs=[iter(lattr(me/*`attr`*),@ATTRIBUTE/ACCESS [last(%i0,`)]=[u(%i0)],,;)] ; [iter(lattr(me/*`hook`*),@HOOK/[last(%i0,/)] [before(last(%i0,`),/)]=[u(%i0)],,;)] ; [iter(lattr(me/*`trg`*),@TRIGGER [u(%i0)],,;)]
+
+@@ @@@@@@@@@@
+@@ Post-installation stuff
+
+@cpattr me/ve=%va
++tmcs/update
+
++tmcs/addpackage core=MUSHcode Core/1.4/Basic object creation and initial code set up for the MUSHcode Suite. Required for all other code packages./\[+TMCS\]%b
+@dol %vb %vd %ve %vs %vi %vc %va=+tmcs/register core=## ; @force ##=home
+
+@wait 5=think ansi(h,Talvo's MUSHcode Suite Core - Installation Complete. Please add the following into #1's @STARTUP:%r@force me=\{\[ufun(%vs/CORE`STARTUP-TRG-1)]\} ; @force me=\{\[ufun(%vs/CORE`STARTUP-TRG-2)]\} ; @force me=\{\[ufun(%vs/CORE`STARTUP-TRG-3)]\}
+
