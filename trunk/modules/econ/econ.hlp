@@ -545,8 +545,12 @@
 
 & ECON CHANGES
 & ECON VERSION
+& ECON 2.2h
 & ECON 2.2g
 
+  Version 2.2h - December 29th 2012
+  * Fixed a bug in +money <player>.
+  
   Version 2.2g - August 20th 2008
 
   * The EGIVE lock was not being checked correctly. Reported
