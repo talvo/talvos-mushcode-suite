@@ -174,7 +174,7 @@ think ansi(h,Installing Econ commands...)
 @@ +MONEY [<object>]
 &econ`cmd.money %va=$+money*: @nspemit/silent %#=ufun(%ve/tag,econ)[ufun(%vb/econ`fun.money,%0)]
 
-&econ`fun.money %vb=switch(0,strlen(%0),ufun(%ve/econ`fun.money-sub,You have,%#),t(setr(0,locate(%#,squish(%0),N*))),switch(%q0,#-1,I don't see that here.,I don't know which one you mean.),ufun(%vb/econ`fun.can-view,%#,%q0),Permission denied.,ufun(%vb/econ`fun.money-sub,switch(%q0,%#,You have,name(%q0) has),%q0))
+&econ`fun.money %vb=ncond(0,strlen(%0),ufun(%ve/econ`fun.money-sub,You have,%#),setr(0,locate(%#,squish(%0),N*)),switch(%q0,#-1,I don't see that here.,I don't know which one you mean.),ufun(%vb/econ`fun.can-view,%#,%q0),Permission denied.,ufun(%ve/econ`fun.money-sub,switch(%q0,%#,You have,name(%q0) has),%q0))
 
 &econ`fun.money-sub %ve=%0 [ufun(%ve/econ`fun.ints-to-words,default(%1/MONEY,0))].
 
@@ -206,7 +206,7 @@ think ansi(h,Setting Startup attributes...)
 @@ @@@@@@@@@@
 think ansi(h,Adding package to the Core...)
 
-+TMCS/ADDPACKAGE econ=Economy System/2.2g/A multi-currency, multi-denomination economy and resource system/\[+MONEY\]%b
++TMCS/ADDPACKAGE econ=Economy System/2.2h/A multi-currency, multi-denomination economy and resource system/\[+MONEY\]%b
 
 @@ @@@@@@@@@@
 think ansi(h,Installation Complete.)
