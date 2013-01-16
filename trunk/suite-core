@@ -156,7 +156,7 @@
 @cpattr me/ve=%va
 +tmcs/update
 
-+tmcs/addpackage core=MUSHcode Core/1.4/Basic object creation and initial code set up for the MUSHcode Suite. Required for all other code packages./\[+TMCS\]%b
++tmcs/addpackage core=MUSHcode Core/1.4-r$Revision$/Basic object creation and initial code set up for the MUSHcode Suite. Required for all other code packages./\[+TMCS\]%b
 @dol %vb %vd %ve %vs %vi %vc %va=+tmcs/register core=## ; @force ##=home
 
 @wait 5=think ansi(h,Talvo's MUSHcode Suite Core - Installation Complete. Please add the following into #1's @STARTUP:%r@force me=\{\[ufun(%vs/CORE`STARTUP-TRG-1)]\} ; @force me=\{\[ufun(%vs/CORE`STARTUP-TRG-2)]\} ; @force me=\{\[ufun(%vs/CORE`STARTUP-TRG-3)]\}
