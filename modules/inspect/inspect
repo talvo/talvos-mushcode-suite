@@ -32,7 +32,7 @@ think ansi(h,Adding Startup attributes...)
 @@ @@@@@@@@@@
 think ansi(h,Adding package to the Core...)
 
-+TMCS/ADDPACKAGE inspect=+Inspect (Views)/1.1b/A +Inspect (Views) system for adding extra, and possibly hidden, details to rooms and other objects/\[+INSPECT\]%b
++TMCS/ADDPACKAGE inspect=+Inspect (Views)/1.1b-r[elements($Revision$,2)]/A +Inspect (Views) system for adding extra, and possibly hidden, details to rooms and other objects/\[+INSPECT\]%b
 
 @@ @@@@@@@@@@
 think ansi(h,Installation Complete.)

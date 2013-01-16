@@ -115,7 +115,7 @@ think ansi(h,Adding Help commands...)
 @@ @@@@@@@@@@
 think ansi(h,Adding package to the Core...)
 
-+TMCS/ADDPACKAGE help=+Help System/1.0/A +Help system allowing for multiple +help-style commands/\[+HELPCMD\]%b
++TMCS/ADDPACKAGE help=+Help System/1.0-r[elements($Revision$,2)]/A +Help system allowing for multiple +help-style commands/\[+HELPCMD\]%b
 +TMCS/REGISTER help=[get(%vi/help`db)]
 
 @@ @@@@@@@@@@

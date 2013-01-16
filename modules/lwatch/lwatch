@@ -43,7 +43,7 @@ think ansi(h,Adding startup attributes...)
 @@ @@@@@@@@@@
 think ansi(h,Adding package to the Core...)
 
-+TMCS/ADDPACKAGE lwatch=+LWatch/1.2/Player connect and disconnect tracker, akin to the MONITOR flag for mortals/\[+LWATCH\]%b
++TMCS/ADDPACKAGE lwatch=+LWatch/1.2-r[elements($Revision$,2)]/Player connect and disconnect tracker, akin to the MONITOR flag for mortals/\[+LWATCH\]%b
 
 think ansi(h,Installation complete.)
 
