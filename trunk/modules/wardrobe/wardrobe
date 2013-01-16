@@ -62,7 +62,7 @@ think ansi(h,Adding Startup attributes...)
 @@ @@@@@@@@@@
 think ansi(h,Adding package to the Core...)
 
-+TMCS/ADDPACKAGE wardrobe=Wardrobe (DescChanger)/1.4b/A Wardrobe (description changer) which can store and set multiple descriptions per player, using MySQL/\[+WARDROBE\]%b
++TMCS/ADDPACKAGE wardrobe=Wardrobe (DescChanger)/1.4b-r[elements($Revision$,2)]/A Wardrobe (description changer) which can store and set multiple descriptions per player, using MySQL/\[+WARDROBE\]%b
 
 @@ @@@@@@@@@@
 +tmcs/update

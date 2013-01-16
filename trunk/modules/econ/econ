@@ -206,7 +206,7 @@ think ansi(h,Setting Startup attributes...)
 @@ @@@@@@@@@@
 think ansi(h,Adding package to the Core...)
 
-+TMCS/ADDPACKAGE econ=Economy System/2.2h/A multi-currency, multi-denomination economy and resource system/\[+MONEY\]%b
++TMCS/ADDPACKAGE econ=Economy System/2.2h-r[elements($Revision$,2)]/A multi-currency, multi-denomination economy and resource system/\[+MONEY\]%b
 
 @@ @@@@@@@@@@
 think ansi(h,Installation Complete.)

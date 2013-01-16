@@ -287,7 +287,7 @@ think ansi(h,Adding Startup Attributes...)
 
 think ansi(h,Registering COM package with the Core...)
 
-+TMCS/ADDPACKAGE com=+Com/1.4/A +com (chat) system to replace the built-in PennMUSH @chat system/\[+COM\]%b
++TMCS/ADDPACKAGE com=+Com/1.4-r[elements($Revision$,2)]/A +com (chat) system to replace the built-in PennMUSH @chat system/\[+COM\]%b
 +TMCS/REGISTER com=%xc
 +TMCS/UPDATE
 

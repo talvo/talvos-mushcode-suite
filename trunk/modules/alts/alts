@@ -36,6 +36,6 @@ think ansi(h,Setting startup attributes...)
 @@ @@@@@@@@@@
 think ansi(h,Adding package to the Core...)
 
-+TMCS/ADDPACKAGE alts=+Alts/1.1b/Alternate Character tracking system/\[+ALTS\]%b
++TMCS/ADDPACKAGE alts=+Alts/1.1b-r[elements($Revision$,2)]/Alternate Character tracking system/\[+ALTS\]%b
 
 think ansi(h,Installation complete.)
