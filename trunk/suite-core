@@ -113,9 +113,9 @@
 
 @@ @@@@@@@@@@
 @@ +TMCS - list all packages
-&core`cmd.list-packages %vd=$+tmcs: @nspemit/silent %#=ufun(%ve/tag,core)The following packages are installed:%r[ufun(%ve/core`fun.list-packages-line,ansi(h,Package),ansi(h,Ver),ansi(h,Full Name))]%r[ufun(%ve/core`fun.list-packages-line,ufun(%ve/divider,10),ufun(%ve/divider,5),ufun(%ve/divider,61))]%r[iter(sortkey(#lambda/get(%vc/info`%%0`installed),ufun(%ve/packages)),ufun(%ve/core`fun.list-packages-line,%i0,get(%vc/info`%i0`version),get(%vc/info`%i0)),,%r)]%r
+&core`cmd.list-packages %vd=$+tmcs: @nspemit/silent %#=ufun(%ve/tag,core)The following packages are installed:%r[ufun(%ve/core`fun.list-packages-line,ansi(h,Package),ansi(h,Ver),ansi(h,Full Name))]%r[ufun(%ve/core`fun.list-packages-line,ufun(%ve/divider,10),ufun(%ve/divider,10),ufun(%ve/divider,55))]%r[iter(sortkey(#lambda/get(%vc/info`%%0`installed),ufun(%ve/packages)),ufun(%ve/core`fun.list-packages-line,%i0,get(%vc/info`%i0`version),get(%vc/info`%i0)),,%r)]%r
 
-&core`fun.list-packages-line %ve=align(10 5 61,left(%0,10),left(%1,5),left(%2,61))
+&core`fun.list-packages-line %ve=align(10 10 55,left(%0,10),left(%1,10),%2)
 
 @@ @@@@@@@@@@
 @@ +TMCS <package> - show info on a package

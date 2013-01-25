@@ -4,7 +4,7 @@
 
 @@ @@@@@@@@@@
 think ansi(h,Creating Help DB...)
-@set %vi=HELP`DB:[create(TMCS +Help DB)]
+@set %vi=HELP`DB:[default(%vi/HELP`DB,create(TMCS +Help DB))]
 
 &help`cmds [get(%vi/help`db)]=0
 
@@ -44,7 +44,7 @@ think ansi(h,Adding Help commands...)
 &help`cmd.helpcmd-footer %vd=$+helpcmd/footer *=*,*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied,ufun(%ve/help`is-cmd-id,%0),No such help command.,setr(1,ufun(%ve/help`fun.sanitize-topic,%1)),No such topic.,strlen(%2),Footer cleared.[attrib_set(get(%vi/help`db)/%0`footer`%q1)],Footer set.[attrib_set(get(%vi/help`db)/%0`footer`%q1,%2)])]
 
 @@ +helpcmd/topic <cmdId>=<topicName>,<text>
-&help`cmd.helpcmd-topic %vd=$+helpcmd/topic *=*,*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`is-cmd-id,%0),No such help command.,regmatch(%1,^\[a-zA-Z0-9_ +=-\]\{1\,30\}),Invalid topic name.,strlen(%2),if(ufun(%ve/help`fun.hastopic,%0,setr(1,ufun(%ve/help`fun.sanitize-topic,%1)),Topic deleted.[wipe(get(%vi/help`db)/%0`*`%q1)],No such topic to delete.),Topic added.[attrib_set(get(%vi/help`db)/%0`topic`%q1,%2)])]
+&help`cmd.helpcmd-topic %vd=$+helpcmd/topic *=*,*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`is-cmd-id,%0),No such help command.,regmatch(%1,^\[a-zA-Z0-9_ +=-\]\{1\,30\}),Invalid topic name.,strlen(%2),if(ufun(%ve/help`fun.hastopic,%0,setr(1,ufun(%ve/help`fun.sanitize-topic,%1))),Topic deleted.[wipe(get(%vi/help`db)/%0`*`%q1)],No such topic to delete.),Topic added.[attrib_set(get(%vi/help`db)/%0`topic`[ufun(%ve/help`fun.sanitize-topic,%1)],%2)])]
 
 @@ +helpcmd/index <cmdId>=<text>
 &help`helpcmd-index %vd=$+helpcmd/index *=*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`is-cmd-id,%0),No such help command.,strlen(%1),Index cleared.[attrib_set(get(%vi/help`db)/%0`index)],Index set.[attrib_set(get(%vi/help`db)/%0`index,%1)])]
