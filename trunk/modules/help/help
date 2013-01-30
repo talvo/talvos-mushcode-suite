@@ -6,7 +6,7 @@
 think ansi(h,Creating Help DB...)
 @set %vi=HELP`DB:[default(%vi/HELP`DB,create(TMCS +Help DB))]
 
-&help`cmds [get(%vi/help`db)]=0
+@assert hasattr(get(%vi/help`db),help`cmds)=&help`cmds [get(%vi/help`db)]=0
 
 @@ This controls who can add, edit and delete individual topics.
 @lock/user:help_edit [get(%vi/help`db)]=flag^wizard|flag^royalty
@@ -41,26 +41,29 @@ think ansi(h,Adding Help commands...)
 &help`fun.lock-cmd %ve=null(lock(get(%vi/help`db)/user:help_cmd_%0,%1))
 
 @@ +helpcmd/footer <cmdId>=<topic>,<text>
-&help`cmd.helpcmd-footer %vd=$+helpcmd/footer *=*,*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied,ufun(%ve/help`is-cmd-id,%0),No such help command.,setr(1,ufun(%ve/help`fun.sanitize-topic,%1)),No such topic.,strlen(%2),Footer cleared.[attrib_set(get(%vi/help`db)/%0`footer`%q1)],Footer set.[attrib_set(get(%vi/help`db)/%0`footer`%q1,%2)])]
+&help`cmd.helpcmd-footer %vd=$+helpcmd/footer *=*,*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied,ufun(%ve/help`fun.is-cmd-id,%0),No such help command.,setr(1,ufun(%ve/help`fun.sanitize-topic,%1)),No such topic.,strlen(%2),Footer cleared.[attrib_set(get(%vi/help`db)/%0`footer`%q1)],Footer set.[attrib_set(get(%vi/help`db)/%0`footer`%q1,%2)])]
 
 @@ +helpcmd/topic <cmdId>=<topicName>,<text>
-&help`cmd.helpcmd-topic %vd=$+helpcmd/topic *=*,*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`is-cmd-id,%0),No such help command.,regmatch(%1,^\[a-zA-Z0-9_ +=-\]\{1\,30\}),Invalid topic name.,strlen(%2),if(ufun(%ve/help`fun.hastopic,%0,setr(1,ufun(%ve/help`fun.sanitize-topic,%1))),Topic deleted.[wipe(get(%vi/help`db)/%0`*`%q1)],No such topic to delete.),Topic added.[attrib_set(get(%vi/help`db)/%0`topic`[ufun(%ve/help`fun.sanitize-topic,%1)],%2)])]
+&help`cmd.helpcmd-topic %vd=$+helpcmd/topic *=*,*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`fun.is-cmd-id,%0),No such help command.,regmatch(%1,^\[a-zA-Z0-9_ +=-\]\{1\,30\}),Invalid topic name.,strlen(%2),if(ufun(%ve/help`fun.hastopic,%0,setr(1,ufun(%ve/help`fun.sanitize-topic,%1))),Topic deleted.[wipe(get(%vi/help`db)/%0`*`%q1)],No such topic to delete.),Topic added.[attrib_set(get(%vi/help`db)/%0`topic`[ufun(%ve/help`fun.sanitize-topic,%1)],%2)])]
 
 @@ +helpcmd/index <cmdId>=<text>
-&help`helpcmd-index %vd=$+helpcmd/index *=*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`is-cmd-id,%0),No such help command.,strlen(%1),Index cleared.[attrib_set(get(%vi/help`db)/%0`index)],Index set.[attrib_set(get(%vi/help`db)/%0`index,%1)])]
+&help`cmd.helpcmd-index %vd=$+helpcmd/index *=*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`fun.is-cmd-id,%0),No such help command.,strlen(%1),Index cleared.[attrib_set(get(%vi/help`db)/%0`index)],Index set.[attrib_set(get(%vi/help`db)/%0`index,%1)])]
+&help`helpcmd-index %vd
 
 @@ +helpcmd/list
 &help`cmd.helpcmd-list %vd=$+helpcmd/list: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,nattr(setr(i,get(%vi/help`db))/help`cmds`*),There are no help commands.,Available help commands:%r[rjust(ID,6)] [ljust(Command,20)] [ljust(Lock,50)]%r[repeat(-,6)] [repeat(-,20)] [repeat(-,50)]%r[iter(lattr(%qi/help`cmds`*),rjust(last(%i0,`),6) [ljust(get(%qi/%i0),20)] [lock(%qi/help_cmd_[last(%i0,`)])],,%r)]%r)]
 
 @@ +helpcmd/lock <cmdID>=<lock>
-&help`cmd.helpcmd-lock %vd=$+helpcmd/lock *=*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`is-cmd-id,%0),No such help command. Use +HELPCMD/LIST for a list.,ufun(%ve/help`fun.is-valid-lock,%1),Invalid lock.,Command re-locked.[ufun(%ve/help`fun.lock-cmd,%0,%qL)])]
+&help`cmd.helpcmd-lock %vd=$+helpcmd/lock *=*: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_edit,%#),Permission denied.,ufun(%ve/help`fun.is-cmd-id,%0),No such help command. Use +HELPCMD/LIST for a list.,ufun(%ve/help`fun.is-valid-lock,%1),Invalid lock.,Command re-locked.[ufun(%ve/help`fun.lock-cmd,%0,%qL)])]
 
 @@ +helpcmd/delete <cmdId>
-&help`cmd.helpcmd-delete %vd=$+helpcmd/delete *: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_delete,%#),Permission denied.,ufun(%ve/help`is-cmd-id,%0),No such help command.,Help command deleted.[ufun(%ve/help`fun.delete-help-cmd,%0)])]
+&help`cmd.helpcmd-delete %vd=$+helpcmd/delete *: @nspemit/silent %#=ufun(%ve/tag,help)[switch(0,elock(get(%vi/help`db)/help_delete,%#),Permission denied.,ufun(%ve/help`fun.is-cmd-id,%0),No such help command.,Help command deleted.[ufun(%ve/help`fun.delete-help-cmd,%0)])]
 
 &help`fun.delete-help-cmd %ve=null(wipe(%vd/help`*_%0)[wipe(setr(i,get(%vi/help`db))/%0)][wipe(%qi/help`cmds`%0)][lock(%vi/user:help_cmd_%0,)])
 
-&help`is-cmd-id %ve=hasattr(get(%vi/help`db),help`cmds`%0)
+&help`fun.is-cmd-id %ve=hasattr(get(%vi/help`db),help`cmds`%0)
+
+
 
 &help`mockup`cmd-notopic %ve=$<cmd>: @nspemit/silent %#=ufun(%ve/help`fun.help-notopic,<num>)
 &help`mockup`cmd-topic %ve=$<cmd> *: @nspemit/silent %#=ufun(%ve/help`fun.help-topic,<num>,%0)
@@ -105,7 +108,7 @@ think ansi(h,Adding Help commands...)
 
 @@ @@@@@@@@
 @@ +help/list [<arg>]
-&help`fun.help-list %ve=switch(0,ufun(%ve/help`fun.canuse,%0,%#),Permission denied.,setr(0,ufun(%ve/help`fun.count-topics,%0,%1)),No matches.,ufun(%ve/help`fun.show,%0,TOPIC LIST,Matches for '%1':%r[table(ufun(%ve/help`list-topics,%0,%1),18,firstof(width(%#,78),78),|,%b)],%q0 match[switch(%q0,1,,es)]))
+&help`fun.help-list %ve=switch(0,ufun(%ve/help`fun.canuse,%0,%#),Permission denied.,setr(0,ufun(%ve/help`fun.count-topics,%0,%1)),No matches.,ufun(%ve/help`fun.show,%0,TOPIC LIST,Matches for '%1':%r[table(ufun(%ve/help`fun.list-topics,%0,%1),18,firstof(width(%#,78),78),|,%b)],%q0 match[switch(%q0,1,,es)]))
 
 @@ @@@@@@@
 @@ +help/search <string>
