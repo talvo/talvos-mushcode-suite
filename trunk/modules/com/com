@@ -292,4 +292,4 @@ think ansi(h,Registering COM package with the Core...)
 +TMCS/UPDATE
 
 
-think ansi(h,Upload complete. Please have #1 [ansi(gh,@FLAG/ADD CHATMUTE=,any,wizard,wizard)] to finish the installation.)
+think ansi(h,Upload complete. Please have #1 [ansi(gh,@FLAG/ADD CHATMUTE=\,any\,wizard\,wizard)] to finish the installation.)
