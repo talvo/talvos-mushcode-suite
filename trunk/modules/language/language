@@ -179,6 +179,6 @@ think ansi(h,Adding package to the Core...)
 +TMCS/ADDPACKAGE lang=+Language/1.3-r[elements($Revision$,2)]/System to allow players to learn and speak many languages/
 
 @@ @@@@@@@@@@
-think ansi(h,Upload complete. Please have #1 [ansi(gh,@flag/add LINGUIST=,any,wizard,wizard)] and [ansi(gh,@flag/add TEACHER=,player,wizard,wizard)] to complete the installation. You will then need to +ADDLANG <language> to add languages.)
+think ansi(h,Upload complete. Please have #1 [ansi(gh,@flag/add LINGUIST=\,any\,wizard\,wizard)] and [ansi(gh,@flag/add TEACHER=\,player\,wizard\,wizard)] to complete the installation. You will then need to +ADDLANG <language> to add languages.)
 
 
