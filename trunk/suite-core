@@ -5,8 +5,8 @@
 @@ installation; they should not be changed or removed afterwards.
 @@ Use the same character to install all packages from the Suite.
 @@
-@@ Written by Mike Griffiths (talvo@talvo.com), latest version and extra
-@@ packages for the suite available from www.talvo.com
+@@ Written by Mike Griffiths (mike@keyboardzombie.com), latest version and extra
+@@ packages for the suite available from www.keyboardzombie.com
 @@ Tested on PennMUSH 1.8.3p3
 @@
 @@ You do not need to make any changes to this file. Just /quote, or
@@ -77,7 +77,7 @@
 @@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@ Core Installation
 
-&info %vc=%rTalvo's MUSHcode Suite was written by Mike Griffiths (talvo@talvo.com). The latest version of the code is available from www.talvo.com%rInstalled Components of the Suite:%r[iter(lattr(%vc/info`*),ansi(h,get(%vc/%i0)) v[get(%vc/%i0`version)] ([rest(%i0,`)]): [get(%vc/%i0`desc)] ([switch(get(%vc/%i0`objects),,0 objects,* *,words(#$) objects - #$,1 object - #$)]),,%r)]%r
+&info %vc=%rTalvo's MUSHcode Suite was written by Mike Griffiths (mike@keyboardzombie.com). The latest version of the code is available from www.keyboardzombie.com%rInstalled Components of the Suite:%r[iter(lattr(%vc/info`*),ansi(h,get(%vc/%i0)) v[get(%vc/%i0`version)] ([rest(%i0,`)]): [get(%vc/%i0`desc)] ([switch(get(%vc/%i0`objects),,0 objects,* *,words(#$) objects - #$,1 object - #$)]),,%r)]%r
 
 @@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@ Core ufuns
