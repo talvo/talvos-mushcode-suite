@@ -1,4 +1,4 @@
-& 78
+& &tmcs-78-top
 @@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 & TMCS
@@ -45,7 +45,7 @@
 
   Continued in HELP +TMCS3.
 
-& TMCS3
+& +TMCS3
 
   +TMCS/UPDATE
   +TMCS/DELETE <package>
@@ -82,5 +82,5 @@
   * Fixed a minor bug in +tmcs/delete
   * /addpackage was misused in the Core installation. Fixed by MuppetFoo.
 
-& 78
+& &tmcs-78-bottom
 @@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
