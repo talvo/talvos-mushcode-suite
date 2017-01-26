@@ -43,7 +43,7 @@
 
   If you have help-files written for a hardcoded help system and wish to 
   upload them into the +helpcmd system, you may find the Helpfile Converter,
-  available at http://www.talvo.com/mush-helpfiles.php helpful. For this 
+  available at http://www.keyboardzombie.com/mush/helpfiles/ helpful. For this 
   system, the attribute name format is <commandID>`topic`%s (see 
   +helpcmd/list to get the correct <commandID>), and the Object Dbref can be
   found with +helpcmd/db. Spaces should be converted to Underscores, as 
